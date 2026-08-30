@@ -18,7 +18,7 @@ function withSecurityHeaders(response) {
   });
 }
 
-export default {
+const worker = {
   async fetch(request, environment) {
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return withSecurityHeaders(new Response('Method not allowed', { status: 405 }));
@@ -35,4 +35,6 @@ export default {
     return withSecurityHeaders(await environment.ASSETS.fetch(fallbackRequest));
   },
 };
+
+export default worker;
 

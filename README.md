@@ -4,6 +4,8 @@ CardScout is a Pokémon card buying-assistant prototype that normalizes card ide
 
 Phase 1 is intentionally **synthetic-only**. Every displayed card, seller, listing, marketplace, and sale is fictional and labeled. No real marketplace integration is claimed, no credentials are bundled, and live and synthetic records cannot be mixed by the service invariant.
 
+[Open the hosted demo](https://cardscout-webmcp-2026.alx21.chatgpt.site/) · [OpenAI WebMCP Challenge](https://openai.com/webmcp-challenge/)
+
 ## What works
 
 - Natural card search plus budget, raw/graded, grade, Seller Trust, and below-market filters.
