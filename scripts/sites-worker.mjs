@@ -1,3 +1,6 @@
+export function createSitesWorker(embeddedAssets) {
+  return `const embeddedAssets = ${JSON.stringify(embeddedAssets)};
+
 const securityHeaders = {
   'Content-Security-Policy': "default-src 'self'; base-uri 'none'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'",
   'Cross-Origin-Opener-Policy': 'same-origin',
@@ -8,33 +11,49 @@ const securityHeaders = {
   'X-Frame-Options': 'DENY',
 };
 
-function withSecurityHeaders(response) {
-  const headers = new Headers(response.headers);
-  for (const [name, value] of Object.entries(securityHeaders)) headers.set(name, value);
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
+function decodeBase64(value) {
+  const binary = atob(value);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+  return bytes;
 }
 
-const worker = {
-  async fetch(request, environment) {
+function responseFor(asset, requestMethod, requestPath) {
+  const headers = new Headers(securityHeaders);
+  headers.set('Content-Type', asset.contentType);
+  headers.set(
+    'Cache-Control',
+    requestPath.startsWith('/assets/')
+      ? 'public, max-age=31536000, immutable'
+      : 'public, max-age=0, must-revalidate',
+  );
+
+  return new Response(requestMethod === 'HEAD' ? null : decodeBase64(asset.body), { headers });
+}
+
+export default {
+  async fetch(request) {
     if (request.method !== 'GET' && request.method !== 'HEAD') {
-      return withSecurityHeaders(new Response('Method not allowed', { status: 405 }));
+      return new Response('Method not allowed', { status: 405, headers: securityHeaders });
     }
 
-    const assetResponse = await environment.ASSETS.fetch(request);
-    if (assetResponse.status !== 404) return withSecurityHeaders(assetResponse);
+    const url = new URL(request.url);
+    let requestPath;
+    try {
+      requestPath = decodeURIComponent(url.pathname);
+    } catch {
+      return new Response('Bad request', { status: 400, headers: securityHeaders });
+    }
 
-    const acceptsHtml = request.headers.get('accept')?.includes('text/html');
-    if (!acceptsHtml) return withSecurityHeaders(assetResponse);
+    const exactAsset = embeddedAssets[requestPath];
+    if (exactAsset) return responseFor(exactAsset, request.method, requestPath);
 
-    const fallbackUrl = new URL('/index.html', request.url);
-    const fallbackRequest = new Request(fallbackUrl, request);
-    return withSecurityHeaders(await environment.ASSETS.fetch(fallbackRequest));
+    if (request.headers.get('accept')?.includes('text/html')) {
+      return responseFor(embeddedAssets['/index.html'], request.method, '/index.html');
+    }
+
+    return new Response('Not found', { status: 404, headers: securityHeaders });
   },
 };
-
-export default worker;
-
+`;
+}
