@@ -1,0 +1,7 @@
+allowBuilds:
+  # The platform binary is supplied by its optional package. Lifecycle scripts
+  # stay disabled in constrained build environments.
+  esbuild: false
+overrides:
+  esbuild: 0.28.1
+

@@ -1,0 +1,50 @@
+{
+  "name": "cardscout",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "vite --configLoader native",
+    "build": "vite build --configLoader native && node scripts/prepare-sites.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "lint": "oxlint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --configLoader native --pool=threads --maxWorkers=1 --no-file-parallelism",
+    "test:watch": "vitest --configLoader native --pool=threads --maxWorkers=1 --no-file-parallelism",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check .",
+    "security:audit": "pnpm audit --audit-level high"
+  },
+  "dependencies": {
+    "@base-ui/react": "1.7.0",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "lucide-react": "1.31.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "recharts": "3.8.0",
+    "tailwind-merge": "3.6.0"
+  },
+  "devDependencies": {
+    "@openai/sites-vite-plugin": "0.2.0",
+    "@tailwindcss/postcss": "4.2.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.6",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.1.1",
+    "jsdom": "^30.0.1",
+    "oxfmt": "0.61.0",
+    "oxlint": "1.76.0",
+    "oxlint-tsgolint": "7.0.2001",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3",
+    "vite": "8.2.2",
+    "vitest": "^4.1.11"
+  },
+  "type": "module"
+}
+
