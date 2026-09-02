@@ -1,0 +1,50 @@
+# Scout
+
+> Scout is a transparent, synthetic-only collectible card buying assistant for people and browser agents. It keeps exact card, variant, condition, grading company, and numeric grade tiers separate before comparing prices.
+
+## What Scout provides
+
+- Normalized card search with exact raw and graded market tiers.
+- Current synthetic listings with item price, known shipping, and total acquisition cost.
+- Latest exact comparable sale plus robust 30-day and 90-day market statistics.
+- Inspectable Deal Score, Seller Trust, confidence, and listing-risk evidence.
+- Side-by-side listing comparison and raw-versus-graded analysis.
+
+## WebMCP tools
+
+- `search_cards` searches normalized cards and returns the strongest exact-tier listing for each card.
+- `get_card_market_state` returns listings, exact comparable-sale statistics, scores, and risks for one normalized card.
+- `assess_listing` explains one listing's cost, comps, Deal Score, Seller Trust, and warnings.
+- `compare_listings` compares two to five listings using aligned market and seller evidence.
+- `find_deals` filters listings by budget, grade, trust, and below-market criteria.
+- `compare_raw_vs_graded` contrasts exact raw and company-and-grade-specific market tiers without pooling them.
+
+All six tools are read-only and use the same deterministic service as the visible React interface.
+
+## Examples
+
+- Find a CGC 10 Ember Dragon ex below its 90-day median.
+- Show PSA 10 cards under $500 from sellers with a trust score of at least 85.
+- Compare a raw Near Mint card with its PSA 9 and PSA 10 market tiers.
+
+## Data provenance and limitations
+
+- Every card, seller, marketplace, listing, sale, review, and price in the current build is fictional synthetic demonstration data.
+- No live marketplace is connected, and synthetic records are never represented as production marketplace data.
+- Scout is decision support, not an authenticity guarantee, investment recommendation, or promise of profit.
+- Scout is not affiliated with Pokémon, Nintendo, The Pokémon Company, or any marketplace.
+
+## Links
+
+- [Live application](https://scout-webmcp-2026.alx21.chatgpt.site/)
+- [Public source](https://github.com/agammann/scout-webmcp)
+- [WebMCP Challenge submission](https://devpost.com/software/cardscout)
+- [Narrated demo](https://www.youtube.com/watch?v=akGIr6avM3g)
+
+## Contact
+
+- Report product or documentation issues through the [public GitHub repository](https://github.com/agammann/scout-webmcp/issues).
+
+## Updates
+
+- The public repository is the source of truth for implementation changes, methodology updates, and release history.

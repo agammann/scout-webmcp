@@ -6,15 +6,33 @@ import { createWebMcpTools, registerScoutWebMcp, type WebMcpToolDefinition } fro
 describe('WebMCP tools', () => {
   it('registers six read-only, strict tools', async () => {
     const definitions: WebMcpToolDefinition[] = [];
-    const result = await registerScoutWebMcp(createDemoCardMarketService(), {
-      modelContext: {
-        registerTool: (definition) => definitions.push(definition),
+    const signals: Array<AbortSignal | undefined> = [];
+    const controller = new AbortController();
+    const result = await registerScoutWebMcp(
+      createDemoCardMarketService(),
+      {
+        modelContext: {
+          registerTool: (definition, options) => {
+            definitions.push(definition);
+            signals.push(options?.signal);
+          },
+        },
       },
-    });
+      undefined,
+      { signal: controller.signal },
+    );
     expect(result).toEqual({ supported: true, count: 6 });
     expect(definitions).toHaveLength(6);
     expect(definitions.every((tool) => tool.annotations.readOnlyHint)).toBe(true);
+    expect(definitions.every((tool) => tool.annotations.untrustedContentHint)).toBe(true);
+    expect(definitions.every((tool) => tool.title.length > 0)).toBe(true);
     expect(definitions.every((tool) => tool.inputSchema.additionalProperties === false)).toBe(true);
+    const searchSchema = definitions.find((tool) => tool.name === 'search_cards')!.inputSchema;
+    const searchFields = Object.values(searchSchema.properties as Record<string, Record<string, unknown>>);
+    expect(searchFields.every((field) => typeof field.description === 'string')).toBe(true);
+    expect(signals).toEqual(Array.from({ length: 6 }, () => controller.signal));
+    controller.abort();
+    expect(controller.signal.aborted).toBe(true);
   });
 
   it('returns provenance, limitations, and UI state from a search', async () => {

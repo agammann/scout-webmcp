@@ -23,6 +23,7 @@ All five verification commands must pass before a release. Add a regression test
 6. Keep scoring functions deterministic and side-effect free. Methodology versions travel with API and WebMCP results.
 7. WebMCP tools are a first-class interface over the same service used by React. Do not create a second business-logic path for agents.
 8. Phase 1 is a read-only browser application. A future server/API owns credentials, persistence, rate limiting, scheduled ingestion, and live-provider calls.
+9. Register tools through the current `document.modelContext` API with one lifecycle `AbortSignal`, human-readable titles, `readOnlyHint`, and `untrustedContentHint`. Abort registrations on page teardown and handle registration failures without exposing secrets. Do not regress to the legacy navigator API or add a nonstandard discovery manifest without a documented compatibility decision and runtime-parity tests.
 
 ## Card normalization invariants
 
@@ -60,7 +61,8 @@ All five verification commands must pass before a release. Add a regression test
 - Provider contract tests cover validation, provenance, mode isolation, throttling, and error mapping.
 - Statistics tests cover windows, exact matches, dedupe, small samples, anomaly handling, and deterministic medians.
 - Score tests cover thresholds, missing evidence, shipping-inclusive price, and explanation components.
-- WebMCP tests cover registration, read-only annotations, strict schemas, invalid input, structured provenance, and UI-state metadata.
+- WebMCP tests cover registration options and lifecycle signals, read-only and untrusted-content annotations, titles, strict schemas, invalid input, structured provenance, and UI-state metadata.
+- Sites release tests cover the public root, static discovery files, security headers, asset 404 behavior, and rejected write methods.
 - UI tests cover the synthetic-data banner, search, comparison guardrails, score explanations, and inaccessible/live-provider states.
 
 ## Pull-request checklist

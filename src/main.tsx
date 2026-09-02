@@ -12,11 +12,22 @@ if (!root) {
   throw new Error('Scout could not find the application root.');
 }
 
-void registerScoutWebMcp(cardMarketService, document, (toolName, result) => {
-  window.dispatchEvent(
-    new CustomEvent('scout:webmcp-result', { detail: { toolName, result } }),
-  );
+const webMcpRegistration = new AbortController();
+
+void registerScoutWebMcp(
+  cardMarketService,
+  document,
+  (toolName, result) => {
+    window.dispatchEvent(
+      new CustomEvent('scout:webmcp-result', { detail: { toolName, result } }),
+    );
+  },
+  { signal: webMcpRegistration.signal },
+).catch(() => {
+  window.dispatchEvent(new CustomEvent('scout:webmcp-registration-error'));
 });
+
+window.addEventListener('pagehide', () => webMcpRegistration.abort(), { once: true });
 
 createRoot(root).render(
   <StrictMode>

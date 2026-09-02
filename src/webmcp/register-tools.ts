@@ -3,14 +3,18 @@ import type { CardMarketService } from '@/src/services/card-market-service';
 
 export interface WebMcpToolDefinition {
   name: string;
+  title: string;
   description: string;
   inputSchema: Record<string, unknown>;
-  annotations: { readOnlyHint: true };
+  annotations: { readOnlyHint: true; untrustedContentHint: true };
   execute: (input: unknown) => unknown;
 }
 
 export interface ModelContextLike {
-  registerTool: (definition: WebMcpToolDefinition) => unknown;
+  registerTool: (
+    definition: WebMcpToolDefinition,
+    options?: { signal?: AbortSignal },
+  ) => unknown;
 }
 
 export interface WebMcpDocumentLike {
@@ -21,13 +25,46 @@ type ToolResultHandler = (toolName: string, result: unknown) => void;
 
 const searchProperties = {
   query: { type: 'string', maxLength: 160, description: 'Card name, set, number, grade, or condition.' },
-  max_total_cents: { type: 'integer', minimum: 1, maximum: 10_000_000 },
-  raw_or_graded: { type: 'string', enum: ['RAW', 'GRADED'] },
-  grading_company: { type: 'string', enum: ['PSA', 'BGS', 'CGC'] },
-  grade: { type: 'number', minimum: 1, maximum: 10 },
-  minimum_seller_trust: { type: 'number', minimum: 0, maximum: 100 },
-  minimum_percent_below_market: { type: 'number', minimum: 0, maximum: 95 },
-  limit: { type: 'integer', minimum: 1, maximum: 25 },
+  max_total_cents: {
+    type: 'integer',
+    minimum: 1,
+    maximum: 10_000_000,
+    description: 'Maximum item price plus known shipping, expressed as integer USD cents.',
+  },
+  raw_or_graded: {
+    type: 'string',
+    enum: ['RAW', 'GRADED'],
+    description: 'Restrict results to raw cards or professionally graded cards.',
+  },
+  grading_company: {
+    type: 'string',
+    enum: ['PSA', 'BGS', 'CGC'],
+    description: 'Exact grading company. Different grading companies are never pooled.',
+  },
+  grade: {
+    type: 'number',
+    minimum: 1,
+    maximum: 10,
+    description: 'Exact numeric grade from 1 to 10. Adjacent grades are never pooled.',
+  },
+  minimum_seller_trust: {
+    type: 'number',
+    minimum: 0,
+    maximum: 100,
+    description: 'Minimum evidence-backed Seller Trust score from 0 to 100.',
+  },
+  minimum_percent_below_market: {
+    type: 'number',
+    minimum: 0,
+    maximum: 95,
+    description: 'Minimum percentage below the exact-tier 90-day median.',
+  },
+  limit: {
+    type: 'integer',
+    minimum: 1,
+    maximum: 25,
+    description: 'Maximum number of normalized results to return.',
+  },
 };
 
 function objectInput(value: unknown): Record<string, unknown> {
@@ -125,10 +162,11 @@ export function createWebMcpTools(
   service: CardMarketService,
   onResult?: ToolResultHandler,
 ): WebMcpToolDefinition[] {
-  const readOnly = { readOnlyHint: true } as const;
+  const readOnly = { readOnlyHint: true, untrustedContentHint: true } as const;
   return [
     {
       name: 'search_cards',
+      title: 'Search cards',
       description: 'Search normalized card variants and return the strongest exact-tier listing for each card.',
       inputSchema: {
         type: 'object',
@@ -141,12 +179,22 @@ export function createWebMcpTools(
     },
     {
       name: 'get_card_market_state',
-      description: 'Get current listings, exact comparable-sales statistics, scores, and risks for one normalized card.',
+      title: 'Get card market state',
+      description:
+        'Get current listings, exact comparable-sales statistics, scores, and risks for one normalized card. Provide either card_id or query.',
       inputSchema: {
         type: 'object',
         properties: {
-          card_id: { type: 'string', maxLength: 160 },
-          query: { type: 'string', maxLength: 160 },
+          card_id: {
+            type: 'string',
+            maxLength: 160,
+            description: 'Canonical Scout card identifier. Use this when a previous result supplied it.',
+          },
+          query: {
+            type: 'string',
+            maxLength: 160,
+            description: 'Card name, set, number, grade, or condition used to resolve one canonical card.',
+          },
         },
         additionalProperties: false,
       },
@@ -158,10 +206,17 @@ export function createWebMcpTools(
     },
     {
       name: 'assess_listing',
+      title: 'Assess listing',
       description: 'Assess one listing using total cost, exact comps, Deal Score, Seller Trust, and warning evidence.',
       inputSchema: {
         type: 'object',
-        properties: { listing_id: { type: 'string', maxLength: 160 } },
+        properties: {
+          listing_id: {
+            type: 'string',
+            maxLength: 160,
+            description: 'Scout listing identifier returned by search_cards or get_card_market_state.',
+          },
+        },
         required: ['listing_id'],
         additionalProperties: false,
       },
@@ -176,13 +231,19 @@ export function createWebMcpTools(
     },
     {
       name: 'compare_listings',
+      title: 'Compare listings',
       description: 'Compare two to five listings using aligned acquisition cost, market, trust, risk, and score evidence.',
       inputSchema: {
         type: 'object',
         properties: {
           listing_ids: {
             type: 'array',
-            items: { type: 'string', maxLength: 160 },
+            description: 'Two to five unique Scout listing identifiers from prior search or market-state results.',
+            items: {
+              type: 'string',
+              maxLength: 160,
+              description: 'A Scout listing identifier.',
+            },
             minItems: 2,
             maxItems: 5,
             uniqueItems: true,
@@ -208,6 +269,7 @@ export function createWebMcpTools(
     },
     {
       name: 'find_deals',
+      title: 'Find deals',
       description: 'Find listings that satisfy a budget, exact grade, seller-trust, and below-market threshold.',
       inputSchema: {
         type: 'object',
@@ -219,12 +281,22 @@ export function createWebMcpTools(
     },
     {
       name: 'compare_raw_vs_graded',
-      description: 'Compare raw-condition and company-and-grade-specific market tiers without pooling them.',
+      title: 'Compare raw versus graded',
+      description:
+        'Compare raw-condition and company-and-grade-specific market tiers without pooling them. Provide either card_id or query.',
       inputSchema: {
         type: 'object',
         properties: {
-          card_id: { type: 'string', maxLength: 160 },
-          query: { type: 'string', maxLength: 160 },
+          card_id: {
+            type: 'string',
+            maxLength: 160,
+            description: 'Canonical Scout card identifier. Use this when a previous result supplied it.',
+          },
+          query: {
+            type: 'string',
+            maxLength: 160,
+            description: 'Card name, set, or number used to resolve one canonical card.',
+          },
         },
         additionalProperties: false,
       },
@@ -241,12 +313,13 @@ export async function registerScoutWebMcp(
   service: CardMarketService,
   target: WebMcpDocumentLike,
   onResult?: ToolResultHandler,
+  options: { signal?: AbortSignal } = {},
 ): Promise<{ supported: boolean; count: number }> {
   const register = target.modelContext?.registerTool;
   if (typeof register !== 'function') return { supported: false, count: 0 };
   const tools = createWebMcpTools(service, onResult);
   for (const tool of tools) {
-    await register.call(target.modelContext, tool);
+    await register.call(target.modelContext, tool, options);
   }
   return { supported: true, count: tools.length };
 }

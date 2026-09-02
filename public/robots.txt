@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://scout-webmcp-2026.alx21.chatgpt.site/sitemap.xml
