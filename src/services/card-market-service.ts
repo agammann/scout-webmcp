@@ -73,7 +73,7 @@ export class CardMarketService {
       synthetic: true,
       asOf: this.snapshot.asOf,
       sourceProviders: this.providerStatuses(),
-      methodologyVersion: 'cardscout-phase1-v1.0',
+      methodologyVersion: 'scout-phase1-v1.0',
       limitations: LIMITATIONS,
       uiState,
       data,
@@ -318,4 +318,3 @@ export function createDemoCardMarketService(): CardMarketService {
 }
 
 export const cardMarketService = createDemoCardMarketService();
-

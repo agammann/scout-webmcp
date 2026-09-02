@@ -1,4 +1,4 @@
-# CardScout — Devpost submission copy
+# Scout — Devpost submission copy
 
 ## Tagline
 
@@ -6,7 +6,7 @@ Know the market before you make the offer.
 
 ## Project description
 
-CardScout is a transparent Pokémon card buying assistant for people and agents. It normalizes the exact card, printing, condition, grading company, and numeric grade before comparing any price. Buyers can inspect current availability, total acquisition cost, the latest exact comparable sale, robust 30- and 90-day medians, Seller Trust evidence, listing warnings, and a fully explained Deal Score.
+Scout is a transparent Pokémon card buying assistant for people and agents. It normalizes the exact card, printing, condition, grading company, and numeric grade before comparing any price. Buyers can inspect current availability, total acquisition cost, the latest exact comparable sale, robust 30- and 90-day medians, Seller Trust evidence, listing warnings, and a fully explained Deal Score.
 
 The Phase 1 judge build is deliberately synthetic-only. Every card, seller, marketplace, listing, and sale is fictional and visibly labeled. This lets judges test the complete workflow without fabricated API claims, scraping, credentials, or accidental mixing of demo and live records.
 
@@ -27,7 +27,7 @@ Collectible-card buyers often have to reconcile ambiguous listing titles, asking
 
 ## How we built it
 
-CardScout is a strict TypeScript and React application built with Vite and deployed through OpenAI Sites. A provider-adapter boundary maps catalog, listing, sales-history, and seller sources into canonical domain records. Deterministic engines handle identity, deduplication, exact comparable matching, median/MAD statistics, Seller Trust, listing risk, and Deal Score. The React UI and imperative WebMCP registrations call the same `CardMarketService`, preventing agent and screen results from drifting.
+Scout is a strict TypeScript and React application built with Vite and deployed through OpenAI Sites. A provider-adapter boundary maps catalog, listing, sales-history, and seller sources into canonical domain records. Deterministic engines handle identity, deduplication, exact comparable matching, median/MAD statistics, Seller Trust, listing risk, and Deal Score. The React UI and imperative WebMCP registrations call the same `CardMarketService`, preventing agent and screen results from drifting.
 
 Responses carry data mode, synthetic status, source capabilities, retrieval time, limitations, methodology version, and suggested UI state. A service invariant rejects any attempt to introduce non-synthetic records into Phase 1. The disabled eBay configuration contains only server-side environment placeholders—no fake endpoint or fallback data.
 
@@ -58,5 +58,4 @@ Phase 2 moves adapters, credentials, rate limits, caching, persistence, and sche
 - Demo: https://cardscout-webmcp-2026.alx21.chatgpt.site/
 - Video: https://youtu.be/vIeV29z518A
 - Submission: https://devpost.com/software/cardscout
-- Source: https://github.com/agammann/cardscout-webmcp
-
+- Source: https://github.com/agammann/scout-webmcp

@@ -17,12 +17,12 @@ vi.mock('recharts', () => ({
   YAxis: () => null,
 }));
 
-import { CardScoutApp } from '@/components/cardscout-app';
+import { ScoutApp } from '@/components/scout-app';
 
-describe('CardScout interface', () => {
+describe('Scout interface', () => {
   it('keeps the synthetic boundary visible and searches normalized cards', async () => {
     const user = userEvent.setup();
-    render(<CardScoutApp />);
+    render(<ScoutApp />);
 
     expect(screen.getByText(/Every listing, sale, seller, and marketplace/).textContent).toMatch(/fictional synthetic/);
     const input = screen.getByTestId('search-input');
@@ -34,4 +34,3 @@ describe('CardScout interface', () => {
     expect(screen.getAllByText('PSA 10').length).toBeGreaterThan(0);
   });
 });
-

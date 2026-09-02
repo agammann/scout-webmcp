@@ -1,6 +1,6 @@
 import { matchesSearch } from '@/src/domain/identity';
 import type { CardIdentity, MarketplaceListing, ProviderStatus, Sale, Seller } from '@/src/domain/types';
-import type { CardScoutProvider } from '@/src/providers/contracts';
+import type { ScoutProvider } from '@/src/providers/contracts';
 
 import {
   demoCards,
@@ -15,7 +15,7 @@ const labels: Record<DemoProviderId, string> = {
   'demo-collector-circuit': 'Collector Circuit Demo',
 };
 
-export class DemoMarketplaceProvider implements CardScoutProvider {
+export class DemoMarketplaceProvider implements ScoutProvider {
   readonly dataMode = 'SYNTHETIC' as const;
   readonly status: ProviderStatus;
 
@@ -34,7 +34,7 @@ export class DemoMarketplaceProvider implements CardScoutProvider {
         sellerReviews: false,
         population: false,
       },
-      limitation: 'Fictional records created only to demonstrate CardScout behavior.',
+      limitation: 'Fictional records created only to demonstrate Scout behavior.',
     };
   }
 
@@ -79,4 +79,3 @@ export function createDemoProviders(): DemoMarketplaceProvider[] {
     new DemoMarketplaceProvider('demo-collector-circuit'),
   ];
 }
-

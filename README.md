@@ -1,6 +1,6 @@
-# CardScout
+# Scout
 
-CardScout is a Pokémon card buying-assistant prototype that normalizes card identity before comparing acquisition cost, exact-tier comparable sales, seller evidence, and listing risk. It exposes the same evidence through a collector-focused interface and six structured WebMCP tools.
+Scout is a Pokémon card buying-assistant prototype that normalizes card identity before comparing acquisition cost, exact-tier comparable sales, seller evidence, and listing risk. It exposes the same evidence through a collector-focused interface and six structured WebMCP tools.
 
 Phase 1 is intentionally **synthetic-only**. Every displayed card, seller, listing, marketplace, and sale is fictional and labeled. No real marketplace integration is claimed, no credentials are bundled, and live and synthetic records cannot be mixed by the service invariant.
 
@@ -40,7 +40,7 @@ pnpm security:audit
 
 ## WebMCP tools
 
-CardScout registers read-only tools through `document.modelContext.registerTool` when the browser supports WebMCP:
+Scout registers read-only tools through `document.modelContext.registerTool` when the browser supports WebMCP:
 
 - `search_cards`
 - `get_card_market_state`
@@ -71,5 +71,4 @@ Tools are strict, read-only, and return `dataMode`, `synthetic`, source status, 
 
 The demo uses no Pokémon artwork, marketplace trademarks, marketplace data, real seller identities, or real completed sales. Future live adapters require documented provider access, reviewed terms, retention rules, attribution, and server-side credentials before enablement. See `docs/DATA_SOURCES.md` and `SECURITY.md`.
 
-CardScout is not affiliated with Nintendo, The Pokémon Company, Game Freak, any grading company, or any marketplace. Scores are decision support, not authentication, investment advice, or a profit guarantee.
-
+Scout is not affiliated with Nintendo, The Pokémon Company, Game Freak, any grading company, or any marketplace. Scores are decision support, not authentication, investment advice, or a profit guarantee.

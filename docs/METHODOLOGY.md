@@ -6,7 +6,7 @@ Card identity is a deterministic key over normalized name, set code/name, number
 
 ## Comparable sales
 
-Listings and sales are deduplicated first. Exact same-card and same-tier sales are ordered by completion time. CardScout reports the latest exact sale immediately, but requires at least three relevant transactions to publish rolling medians.
+Listings and sales are deduplicated first. Exact same-card and same-tier sales are ordered by completion time. Scout reports the latest exact sale immediately, but requires at least three relevant transactions to publish rolling medians.
 
 The 90-day series uses total sold cost (price plus known shipping). With five or more observations, extreme log-price deviations are identified with a median absolute deviation threshold of 3.5. Anomalies remain visible by ID but are excluded from robust medians and cleaned ranges. A recency-weighted 90-day median uses exponential decay with a 45-day scale.
 
@@ -23,4 +23,3 @@ The score is withheld below 55% evidence coverage. Seller identities are platfor
 Deal Score is 40% total acquisition price versus the exact cleaned 90-day median, 20% comparable-sale confidence, 20% Seller Trust, 10% listing quality, and 10% liquidity. Price uses a bounded logistic transformation so extreme discounts cannot dominate the result. The overall score is withheld without both a reliable median and a Seller Trust score.
 
 Classifications are: 90–100 Exceptional Deal; 80–89 Strong Buy; 70–79 Good Price; 55–69 Fair Price; 40–54 Slightly Expensive; below 40 Overpriced. These labels describe evidence relative to the available market sample, not future return, authenticity, or investment merit.
-

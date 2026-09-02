@@ -1,4 +1,4 @@
-# CardScout engineering contract
+# Scout engineering contract
 
 This file governs all work in this repository. Phase 1 is a synthetic-only vertical slice for the OpenAI WebMCP Challenge.
 
@@ -66,4 +66,3 @@ All five verification commands must pass before a release. Add a regression test
 ## Pull-request checklist
 
 Document data provenance, privacy/licensing implications, migrations, methodology changes, and user-visible limitations. Run tests, lint, typecheck, build, and the high-severity audit; report the exact results without overstating untested behavior.
-

@@ -89,7 +89,7 @@ function searchInput(
   return input;
 }
 
-export function CardScoutApp() {
+export function ScoutApp() {
   const initialSearch = useMemo(
     () => cardMarketService.searchCards({ query: DEFAULT_QUERY, limit: 20 }),
     [],
@@ -150,8 +150,8 @@ export function CardScoutApp() {
         setView('market');
       }
     };
-    window.addEventListener('cardscout:webmcp-result', handler);
-    return () => window.removeEventListener('cardscout:webmcp-result', handler);
+    window.addEventListener('scout:webmcp-result', handler);
+    return () => window.removeEventListener('scout:webmcp-result', handler);
   }, []);
 
   const runSearch = () => {
@@ -208,7 +208,7 @@ export function CardScoutApp() {
               <BarChart3 className="size-5" aria-hidden="true" />
             </span>
             <span>
-              <span className="block text-[15px] font-semibold tracking-[-0.02em]">CardScout</span>
+              <span className="block text-[15px] font-semibold tracking-[-0.02em]">Scout</span>
               <span className="block text-[9px] uppercase tracking-[0.17em] text-white/45">Collector intelligence</span>
             </span>
           </button>
@@ -737,10 +737,10 @@ function MethodologyView() {
     <section className="mx-auto max-w-[1200px] px-4 py-10 sm:px-7">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Transparent by design</p>
       <h1 className="mt-1 max-w-3xl text-4xl font-semibold tracking-[-0.045em]">A score should be inspectable, reproducible, and willing to say “unknown.”</h1>
-      <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground">CardScout never turns asking prices into sales, aggregate guide values into a latest sale, or missing seller evidence into a zero. Estimates are withheld when fewer than three exact comps are available.</p>
+      <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground">Scout never turns asking prices into sales, aggregate guide values into a latest sale, or missing seller evidence into a zero. Estimates are withheld when fewer than three exact comps are available.</p>
       <div className="mt-8 grid gap-4 md:grid-cols-2">{steps.map(([title, body], index) => <Card key={title} className="border-0 bg-white ring-1 ring-slate-200"><CardContent><span className="text-xs font-semibold text-[#1d7557]">0{index + 1}</span><h2 className="mt-2 text-lg font-semibold">{title}</h2><p className="mt-2 text-sm leading-6 text-muted-foreground">{body}</p></CardContent></Card>)}</div>
       <div className="mt-8 grid gap-4 lg:grid-cols-2"><MethodCard title="Deal Score v1.0" icon={BarChart3} items={['40% price versus exact 90-day median', '20% comparable-sale confidence', '20% Seller Trust', '10% listing quality', '10% exact-tier liquidity']} /><MethodCard title="Seller Trust v1.0" icon={ShieldCheck} items={['35% feedback confidence with sample adjustment', '15% transaction volume', '15% recent rating mix', '10% tenure', '10% returns and verified indicators', '10% relevant selling history', '5% listing consistency']} /></div>
-      <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950"><strong>Important:</strong> CardScout reports evidence and warning signals. It does not authenticate cards, accuse sellers of fraud, guarantee profit, or provide investment advice.</div>
+      <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950"><strong>Important:</strong> Scout reports evidence and warning signals. It does not authenticate cards, accuse sellers of fraud, guarantee profit, or provide investment advice.</div>
       <DisclaimerFooter />
     </section>
   );
@@ -770,6 +770,5 @@ function PolicyItem({ icon: Icon, title, body }: { icon: typeof Database; title:
 }
 
 function DisclaimerFooter() {
-  return <footer className="border-t bg-white"><div className="mx-auto flex max-w-[1500px] flex-col justify-between gap-2 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:px-7"><span>CardScout Phase 1 · Synthetic demonstration only</span><span>Not affiliated with Pokémon, Nintendo, The Pokémon Company, or any marketplace. Not investment advice.</span></div></footer>;
+  return <footer className="border-t bg-white"><div className="mx-auto flex max-w-[1500px] flex-col justify-between gap-2 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:px-7"><span>Scout Phase 1 · Synthetic demonstration only</span><span>Not affiliated with Pokémon, Nintendo, The Pokémon Company, or any marketplace. Not investment advice.</span></div></footer>;
 }
-

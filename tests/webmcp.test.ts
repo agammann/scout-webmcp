@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { createDemoCardMarketService } from '@/src/services/card-market-service';
-import { createWebMcpTools, registerCardScoutWebMcp, type WebMcpToolDefinition } from '@/src/webmcp/register-tools';
+import { createWebMcpTools, registerScoutWebMcp, type WebMcpToolDefinition } from '@/src/webmcp/register-tools';
 
 describe('WebMCP tools', () => {
   it('registers six read-only, strict tools', async () => {
     const definitions: WebMcpToolDefinition[] = [];
-    const result = await registerCardScoutWebMcp(createDemoCardMarketService(), {
+    const result = await registerScoutWebMcp(createDemoCardMarketService(), {
       modelContext: {
         registerTool: (definition) => definitions.push(definition),
       },
@@ -40,10 +40,9 @@ describe('WebMCP tools', () => {
   });
 
   it('feature-detects browsers without WebMCP support', async () => {
-    await expect(registerCardScoutWebMcp(createDemoCardMarketService(), {})).resolves.toEqual({
+    await expect(registerScoutWebMcp(createDemoCardMarketService(), {})).resolves.toEqual({
       supported: false,
       count: 0,
     });
   });
 });
-

@@ -30,7 +30,7 @@ export interface SellerProvider {
   getSeller(sellerId: string): Promise<Seller | undefined> | Seller | undefined;
 }
 
-export interface CardScoutProvider
+export interface ScoutProvider
   extends CatalogProvider,
     MarketplaceProvider,
     SalesHistoryProvider,
@@ -44,4 +44,3 @@ export class ProviderUnavailableError extends Error {
     this.name = 'ProviderUnavailableError';
   }
 }
-

@@ -237,7 +237,7 @@ export function createWebMcpTools(
   ];
 }
 
-export async function registerCardScoutWebMcp(
+export async function registerScoutWebMcp(
   service: CardMarketService,
   target: WebMcpDocumentLike,
   onResult?: ToolResultHandler,
@@ -261,4 +261,3 @@ export function isSyntheticEnvelope(value: unknown): value is ResponseEnvelope<u
     value.synthetic === true
   );
 }
-
