@@ -25,6 +25,9 @@ describe('Scout interface', () => {
     render(<ScoutApp />);
 
     expect(screen.getByText(/Every listing, sale, seller, and marketplace/).textContent).toMatch(/fictional synthetic/);
+    expect(
+      screen.getByRole('link', { name: 'Watch Scout demo video' }).getAttribute('href'),
+    ).toBe('https://youtu.be/akGIr6avM3g');
     const input = screen.getByTestId('search-input');
     await user.clear(input);
     await user.type(input, 'Volt Lynx PSA 10');

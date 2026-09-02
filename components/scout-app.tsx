@@ -14,6 +14,7 @@ import {
   Layers3,
   LineChart as LineChartIcon,
   LockKeyhole,
+  PlayCircle,
   Search,
   ShieldCheck,
   Sparkles,
@@ -230,6 +231,17 @@ export function ScoutApp() {
               </Button>
             ))}
           </nav>
+          <a
+            href="https://youtu.be/akGIr6avM3g"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Watch Scout demo video"
+            className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-2.5 text-xs font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d8ff67] sm:px-3"
+          >
+            <PlayCircle className="size-4" aria-hidden="true" />
+            <span className="hidden sm:inline">Watch demo</span>
+            <span className="sr-only sm:hidden">Watch Scout demo</span>
+          </a>
           <Badge className="border-amber-300/20 bg-amber-300/10 text-amber-100">
             Synthetic demo
           </Badge>

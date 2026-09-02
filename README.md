@@ -4,7 +4,7 @@ Scout is a Pokémon card buying-assistant prototype that normalizes card identit
 
 Phase 1 is intentionally **synthetic-only**. Every displayed card, seller, listing, marketplace, and sale is fictional and labeled. No real marketplace integration is claimed, no credentials are bundled, and live and synthetic records cannot be mixed by the service invariant.
 
-[Open the hosted demo](https://scout-webmcp-2026.alx21.chatgpt.site/) · [OpenAI WebMCP Challenge](https://openai.com/webmcp-challenge/)
+[Open the hosted demo](https://scout-webmcp-2026.alx21.chatgpt.site/) · [Watch the 2:29 demo video](https://youtu.be/akGIr6avM3g) · [OpenAI WebMCP Challenge](https://openai.com/webmcp-challenge/)
 
 ## What works
 
