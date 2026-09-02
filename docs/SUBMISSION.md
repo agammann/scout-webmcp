@@ -55,7 +55,7 @@ Phase 2 moves adapters, credentials, rate limits, caching, persistence, and sche
 
 ## Links
 
-- Demo: https://cardscout-webmcp-2026.alx21.chatgpt.site/
+- Demo: https://scout-webmcp-2026.alx21.chatgpt.site/
 - Video: https://youtu.be/vIeV29z518A
 - Submission: https://devpost.com/software/cardscout
 - Source: https://github.com/agammann/scout-webmcp
