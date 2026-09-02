@@ -1,8 +1,6 @@
 const { default: worker } = await import(`../dist/server/index.js?build=${Date.now()}`);
 
-const rootResponse = await worker.fetch(
-  new Request('https://scout.invalid/', { headers: { accept: 'text/html' } }),
-);
+const rootResponse = await worker.fetch(new Request('https://scout.invalid/'));
 if (rootResponse.status !== 200) throw new Error(`Sites worker root returned ${rootResponse.status}.`);
 if (!rootResponse.headers.get('content-type')?.startsWith('text/html')) {
   throw new Error('Sites worker root did not return HTML.');

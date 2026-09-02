@@ -45,6 +45,10 @@ export default {
       return new Response('Bad request', { status: 400, headers: securityHeaders });
     }
 
+    if (requestPath === '/') {
+      return responseFor(embeddedAssets['/index.html'], request.method, '/index.html');
+    }
+
     const exactAsset = embeddedAssets[requestPath];
     if (exactAsset) return responseFor(exactAsset, request.method, requestPath);
 
