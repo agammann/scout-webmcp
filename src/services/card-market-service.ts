@@ -1,4 +1,9 @@
-import { matchesSearch, marketTierKey, sameCardVariant, sameMarketTier } from '@/src/domain/identity';
+import {
+  matchesSearch,
+  marketTierKey,
+  sameCardVariant,
+  sameMarketTier,
+} from '@/src/domain/identity';
 import type {
   CardIdentity,
   ComparisonResult,
@@ -19,7 +24,13 @@ import { assessListingRisks } from '@/src/engine/listing-risks';
 import { calculateMarketStatistics } from '@/src/engine/market-statistics';
 import { assessSellerTrust } from '@/src/engine/seller-trust';
 import { createDemoProviders } from '@/src/providers/demo/demo-provider';
-import { DEMO_AS_OF, demoCards, demoListings, demoSales, demoSellers } from '@/src/providers/demo/data';
+import {
+  DEMO_AS_OF,
+  demoCards,
+  demoListings,
+  demoSales,
+  demoSellers,
+} from '@/src/providers/demo/data';
 
 const LIMITATIONS = [
   'All displayed marketplace, seller, listing, and sale records are fictional synthetic demo data.',
@@ -44,11 +55,16 @@ export class CardMarketService {
 
   constructor(private readonly snapshot: ProviderSnapshot) {
     if (snapshot.statuses.some((status) => status.dataMode !== 'SYNTHETIC')) {
-      throw new Error('Phase 1 CardMarketService accepts only SYNTHETIC provider snapshots.');
+      throw new Error(
+        'CardMarketService accepts only SYNTHETIC provider snapshots.',
+      );
     }
     if (
-      [...snapshot.listings, ...snapshot.sales].some(
-        (record) => record.provenance.dataMode !== 'SYNTHETIC' || !record.provenance.synthetic,
+      [...snapshot.listings, ...snapshot.sales, ...snapshot.sellers].some(
+        (record) =>
+          record.provenance.dataMode !== 'SYNTHETIC' ||
+          !record.provenance.synthetic ||
+          record.providerId !== record.provenance.providerId,
       )
     ) {
       throw new Error('Synthetic/live data isolation invariant failed.');
@@ -56,7 +72,9 @@ export class CardMarketService {
     const deduped = dedupeListings(snapshot.listings);
     this.uniqueListings = deduped.unique;
     this.duplicateListingGroups = deduped.duplicateGroups;
-    this.sellerById = new Map(snapshot.sellers.map((seller) => [seller.id, seller]));
+    this.sellerById = new Map(
+      snapshot.sellers.map((seller) => [seller.id, seller]),
+    );
   }
 
   providerStatuses(): ProviderStatus[] {
@@ -67,13 +85,16 @@ export class CardMarketService {
     return [...this.uniqueListings];
   }
 
-  private envelope<T>(data: T, uiState: ResponseEnvelope<T>['uiState']): ResponseEnvelope<T> {
+  private envelope<T>(
+    data: T,
+    uiState: ResponseEnvelope<T>['uiState'],
+  ): ResponseEnvelope<T> {
     return {
       dataMode: 'SYNTHETIC',
       synthetic: true,
       asOf: this.snapshot.asOf,
       sourceProviders: this.providerStatuses(),
-      methodologyVersion: 'scout-phase1-v1.0',
+      methodologyVersion: 'scout-lab-v1.1',
       limitations: LIMITATIONS,
       uiState,
       data,
@@ -91,7 +112,15 @@ export class CardMarketService {
     );
     const deal = assessDeal(listing, market, seller, sellerTrust);
     const risks = assessListingRisks(listing, market, seller, sellerTrust);
-    return { listing, seller, sellerTrust, market, deal, risks, comparableSales: comparables };
+    return {
+      listing,
+      seller,
+      sellerTrust,
+      market,
+      deal,
+      risks,
+      comparableSales: comparables,
+    };
   }
 
   assessListing(listingId: string): ResponseEnvelope<ListingAssessment> {
@@ -105,34 +134,78 @@ export class CardMarketService {
     });
   }
 
-  searchCards(input: SearchInput): ResponseEnvelope<SearchResult[]> {
-    const limit = Math.max(1, Math.min(input.limit ?? 12, 25));
-    const assessments = this.uniqueListings
-      .filter((listing) => matchesSearch(listing.identity, listing.tier, input.query))
+  private matchingAssessments(input: SearchInput): ListingAssessment[] {
+    if (typeof input.query !== 'string' || input.query.length > 160)
+      throw new Error('Query must be at most 160 characters.');
+    const bounds = [
+      ['maxTotalCents', 1, 10000000],
+      ['grade', 1, 10],
+      ['minimumSellerTrust', 0, 100],
+      ['minimumPercentBelowMarket', 0, 95],
+      ['limit', 1, 25],
+    ] as const;
+    for (const [key, min, max] of bounds) {
+      const value = input[key];
+      if (
+        value !== undefined &&
+        (!Number.isFinite(value) || value < min || value > max)
+      )
+        throw new Error(`${key} must be from ${min} to ${max}.`);
+    }
+    for (const key of ['limit', 'maxTotalCents'] as const)
+      if (input[key] !== undefined && !Number.isInteger(input[key]))
+        throw new Error(`${key} must be an integer.`);
+    if (
+      input.rawOrGraded === 'RAW' &&
+      (input.grade !== undefined || input.gradingCompany)
+    )
+      throw new Error(
+        'Raw cards cannot have a grading company or grade filter.',
+      );
+    return this.uniqueListings
+      .filter((listing) =>
+        matchesSearch(listing.identity, listing.tier, input.query),
+      )
       .map((listing) => this.assessmentFor(listing))
       .filter((assessment) => {
         const { listing, sellerTrust, deal } = assessment;
-        if (input.maxTotalCents !== undefined && deal.totalAcquisition.amountCents > input.maxTotalCents) return false;
-        if (input.rawOrGraded && listing.tier.kind !== input.rawOrGraded) return false;
         if (
-          input.gradingCompany &&
-          (listing.tier.kind !== 'GRADED' || listing.tier.company !== input.gradingCompany)
+          input.maxTotalCents !== undefined &&
+          deal.totalAcquisition.amountCents > input.maxTotalCents
         )
           return false;
-        if (input.grade !== undefined && (listing.tier.kind !== 'GRADED' || listing.tier.grade !== input.grade)) return false;
+        if (input.rawOrGraded && listing.tier.kind !== input.rawOrGraded)
+          return false;
+        if (
+          input.gradingCompany &&
+          (listing.tier.kind !== 'GRADED' ||
+            listing.tier.company !== input.gradingCompany)
+        )
+          return false;
+        if (
+          input.grade !== undefined &&
+          (listing.tier.kind !== 'GRADED' || listing.tier.grade !== input.grade)
+        )
+          return false;
         if (
           input.minimumSellerTrust !== undefined &&
-          (sellerTrust.score === null || sellerTrust.score < input.minimumSellerTrust)
+          (sellerTrust.score === null ||
+            sellerTrust.score < input.minimumSellerTrust)
         )
           return false;
         if (
           input.minimumPercentBelowMarket !== undefined &&
-          (deal.percentFromMedian90 === undefined || deal.percentFromMedian90 > -input.minimumPercentBelowMarket)
+          (deal.percentFromMedian90 === undefined ||
+            deal.percentFromMedian90 > -input.minimumPercentBelowMarket)
         )
           return false;
         return true;
       });
+  }
 
+  searchCards(input: SearchInput): ResponseEnvelope<SearchResult[]> {
+    const limit = input.limit ?? 12;
+    const assessments = this.matchingAssessments(input);
     const grouped = new Map<string, ListingAssessment[]>();
     for (const assessment of assessments) {
       const id = assessment.listing.identity.id;
@@ -146,30 +219,46 @@ export class CardMarketService {
             (right.deal.score ?? right.deal.marketDealScore ?? -1) -
             (left.deal.score ?? left.deal.marketDealScore ?? -1),
         );
-        const tierMap = new Map(sorted.map((item) => [marketTierKey(item.listing.tier), item.listing.tier]));
+        const tierMap = new Map(
+          sorted.map((item) => [
+            marketTierKey(item.listing.tier),
+            item.listing.tier,
+          ]),
+        );
         return {
-          card: this.snapshot.cards.find((card) => card.id === cardId) ?? sorted[0].listing.identity,
+          card:
+            this.snapshot.cards.find((card) => card.id === cardId) ??
+            sorted[0].listing.identity,
           tiers: [...tierMap.values()],
           listingCount: sorted.length,
+          listingIds: sorted.map((item) => item.listing.id),
           bestListing: sorted[0],
         };
       })
       .sort(
         (left, right) =>
-          (right.bestListing?.deal.score ?? right.bestListing?.deal.marketDealScore ?? -1) -
-          (left.bestListing?.deal.score ?? left.bestListing?.deal.marketDealScore ?? -1),
+          (right.bestListing?.deal.score ??
+            right.bestListing?.deal.marketDealScore ??
+            -1) -
+          (left.bestListing?.deal.score ??
+            left.bestListing?.deal.marketDealScore ??
+            -1),
       )
       .slice(0, limit);
 
     return this.envelope(results, {
       route: `/#search=${encodeURIComponent(input.query)}`,
       query: input.query,
+      searchInput: { ...input },
       selectedCardId: results[0]?.card.id,
       activeView: 'search',
     });
   }
 
-  getCardMarketState(cardId: string): ResponseEnvelope<{ card: CardIdentity; assessments: ListingAssessment[] }> {
+  getCardMarketState(cardId: string): ResponseEnvelope<{
+    card: CardIdentity;
+    assessments: ListingAssessment[];
+  }> {
     const card = this.snapshot.cards.find((item) => item.id === cardId);
     if (!card) throw new Error(`Card ${cardId} was not found.`);
     const assessments = this.uniqueListings
@@ -180,11 +269,14 @@ export class CardMarketService {
           (right.deal.score ?? right.deal.marketDealScore ?? -1) -
           (left.deal.score ?? left.deal.marketDealScore ?? -1),
       );
-    return this.envelope({ card, assessments }, {
-      route: `/#card=${encodeURIComponent(cardId)}`,
-      selectedCardId: cardId,
-      activeView: 'card',
-    });
+    return this.envelope(
+      { card, assessments },
+      {
+        route: `/#card=${encodeURIComponent(cardId)}`,
+        selectedCardId: cardId,
+        activeView: 'card',
+      },
+    );
   }
 
   compareListings(listingIds: string[]): ResponseEnvelope<ComparisonResult> {
@@ -193,18 +285,20 @@ export class CardMarketService {
       throw new Error('Compare requires between 2 and 5 unique listing IDs.');
     }
     const assessments = uniqueIds.map((id) => this.assessListing(id).data);
-    const sorted = [...assessments].sort(
-      (left, right) =>
-        (right.deal.score ?? right.deal.marketDealScore ?? -1) -
-        (left.deal.score ?? left.deal.marketDealScore ?? -1),
-    );
+    const sorted = assessments
+      .filter((item) => item.deal.score !== null)
+      .sort(
+        (left, right) =>
+          (right.deal.score ?? right.deal.marketDealScore ?? -1) -
+          (left.deal.score ?? left.deal.marketDealScore ?? -1),
+      );
     const strongest = sorted[0];
     const result: ComparisonResult = {
       assessments,
       strongestListingId: strongest?.listing.id,
       summary: strongest
         ? `${strongest.listing.title} has the strongest evidence-adjusted score among the selected listings.`
-        : 'No comparable listing was available.',
+        : 'Overall scores are withheld for every selected listing; no strongest listing can be determined.',
     };
     return this.envelope(result, {
       route: `/#compare=${uniqueIds.map(encodeURIComponent).join(',')}`,
@@ -216,36 +310,7 @@ export class CardMarketService {
 
   findDeals(input: SearchInput): ResponseEnvelope<ListingAssessment[]> {
     const query = input.query.trim();
-    const assessments = this.uniqueListings
-      .filter((listing) => (query ? matchesSearch(listing.identity, listing.tier, query) : true))
-      .map((listing) => this.assessmentFor(listing))
-      .filter((assessment) => {
-        if (input.maxTotalCents !== undefined && assessment.deal.totalAcquisition.amountCents > input.maxTotalCents)
-          return false;
-        if (
-          input.minimumSellerTrust !== undefined &&
-          (assessment.sellerTrust.score === null || assessment.sellerTrust.score < input.minimumSellerTrust)
-        )
-          return false;
-        if (
-          input.minimumPercentBelowMarket !== undefined &&
-          (assessment.deal.percentFromMedian90 === undefined ||
-            assessment.deal.percentFromMedian90 > -input.minimumPercentBelowMarket)
-        )
-          return false;
-        if (
-          input.gradingCompany &&
-          (assessment.listing.tier.kind !== 'GRADED' ||
-            assessment.listing.tier.company !== input.gradingCompany)
-        )
-          return false;
-        if (
-          input.grade !== undefined &&
-          (assessment.listing.tier.kind !== 'GRADED' || assessment.listing.tier.grade !== input.grade)
-        )
-          return false;
-        return true;
-      })
+    const assessments = this.matchingAssessments(input)
       .sort(
         (left, right) =>
           (right.deal.score ?? right.deal.marketDealScore ?? -1) -
@@ -256,8 +321,11 @@ export class CardMarketService {
     return this.envelope(assessments, {
       route: `/#deals=${encodeURIComponent(query)}`,
       query,
+      searchInput: { ...input },
       selectedCardId: assessments[0]?.listing.identity.id,
-      selectedListingIds: assessments.map((assessment) => assessment.listing.id),
+      selectedListingIds: assessments.map(
+        (assessment) => assessment.listing.id,
+      ),
       activeView: 'deals',
     });
   }
@@ -265,15 +333,24 @@ export class CardMarketService {
   compareRawVsGraded(cardId: string): ResponseEnvelope<RawVsGradedResult> {
     const card = this.snapshot.cards.find((item) => item.id === cardId);
     if (!card) throw new Error(`Card ${cardId} was not found.`);
-    const relevant = this.uniqueListings.filter((listing) => sameCardVariant(listing.identity, card));
+    const relevant = this.uniqueListings.filter((listing) =>
+      sameCardVariant(listing.identity, card),
+    );
     const uniqueByTier = new Map<string, MarketplaceListing>();
     for (const listing of relevant) {
-      uniqueByTier.set(marketTierKey(listing.tier), listing);
+      uniqueByTier.set(
+        `${marketTierKey(listing.tier)}:${listing.price.currency}`,
+        listing,
+      );
     }
     const raw: RawVsGradedResult['raw'] = [];
     const graded: RawVsGradedResult['graded'] = [];
     for (const listing of uniqueByTier.values()) {
-      const { market } = calculateMarketStatistics(listing, this.snapshot.sales, this.snapshot.asOf);
+      const { market } = calculateMarketStatistics(
+        listing,
+        this.snapshot.sales,
+        this.snapshot.asOf,
+      );
       if (listing.tier.kind === 'RAW') raw.push({ tier: listing.tier, market });
       else graded.push({ tier: listing.tier, market });
     }
@@ -291,16 +368,24 @@ export class CardMarketService {
   }
 
   resolveCardId(query: string): string | undefined {
-    return this.snapshot.cards.find((card) =>
+    const matches = this.snapshot.cards.filter((card) =>
       this.uniqueListings.some(
-        (listing) => listing.identity.id === card.id && matchesSearch(card, listing.tier, query),
+        (listing) =>
+          listing.identity.id === card.id &&
+          matchesSearch(card, listing.tier, query),
       ),
-    )?.id;
+    );
+    if (matches.length > 1)
+      throw new Error(
+        'Multiple card variants match. Search first and provide an exact card_id.',
+      );
+    return matches[0]?.id;
   }
 
   findTier(cardId: string, target: MarketTier): MarketplaceListing | undefined {
     return this.uniqueListings.find(
-      (listing) => listing.identity.id === cardId && sameMarketTier(listing.tier, target),
+      (listing) =>
+        listing.identity.id === cardId && sameMarketTier(listing.tier, target),
     );
   }
 }

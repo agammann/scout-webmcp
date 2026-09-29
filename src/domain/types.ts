@@ -1,9 +1,26 @@
 export type DataMode = 'LIVE' | 'SANDBOX' | 'SYNTHETIC';
 export type Currency = 'USD' | 'EUR' | 'GBP' | 'CAD';
-export type Language = 'ENGLISH' | 'JAPANESE' | 'GERMAN' | 'FRENCH' | 'SPANISH' | 'ITALIAN';
+export type Language =
+  | 'ENGLISH'
+  | 'JAPANESE'
+  | 'GERMAN'
+  | 'FRENCH'
+  | 'SPANISH'
+  | 'ITALIAN';
 export type Finish = 'NON_HOLO' | 'HOLO' | 'REVERSE_HOLO' | 'SPECIAL';
-export type Edition = 'FIRST_EDITION' | 'UNLIMITED' | 'SHADOWLESS' | 'PROMO' | 'STANDARD';
-export type RawCondition = 'MINT' | 'NEAR_MINT' | 'LIGHTLY_PLAYED' | 'MODERATELY_PLAYED' | 'HEAVILY_PLAYED' | 'DAMAGED';
+export type Edition =
+  | 'FIRST_EDITION'
+  | 'UNLIMITED'
+  | 'SHADOWLESS'
+  | 'PROMO'
+  | 'STANDARD';
+export type RawCondition =
+  | 'MINT'
+  | 'NEAR_MINT'
+  | 'LIGHTLY_PLAYED'
+  | 'MODERATELY_PLAYED'
+  | 'HEAVILY_PLAYED'
+  | 'DAMAGED';
 export type GradingCompany = 'PSA' | 'BGS' | 'CGC';
 export type ConfidenceLabel = 'LOW' | 'MEDIUM' | 'HIGH';
 export type RiskSeverity = 'INFO' | 'LOW' | 'MEDIUM' | 'HIGH';
@@ -140,6 +157,8 @@ export interface MarketStatistics {
   weightedMedian90?: Money;
   count30: number;
   count90: number;
+  cleanedCount30: number;
+  cleanedCount90: number;
   low90?: Money;
   high90?: Money;
   cleanedLow90?: Money;
@@ -219,6 +238,7 @@ export interface ResponseEnvelope<T> {
   uiState: {
     route: string;
     query?: string;
+    searchInput?: SearchInput;
     selectedCardId?: string;
     selectedListingIds?: string[];
     activeView?: string;
@@ -241,6 +261,7 @@ export interface SearchResult {
   card: CardIdentity;
   tiers: MarketTier[];
   listingCount: number;
+  listingIds: string[];
   bestListing?: ListingAssessment;
 }
 
@@ -256,4 +277,3 @@ export interface RawVsGradedResult {
   graded: Array<{ tier: GradedTier; market: MarketStatistics }>;
   note: string;
 }
-

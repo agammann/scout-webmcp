@@ -40,3 +40,6 @@ next-env.d.ts
 /outputs/
 /work/
 /docs/*.mp4
+
+/playwright-report/
+/test-results/

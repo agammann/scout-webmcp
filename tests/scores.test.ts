@@ -36,4 +36,3 @@ describe('evidence-based scores', () => {
     expect(result.label).toBe('WITHHELD');
   });
 });
-

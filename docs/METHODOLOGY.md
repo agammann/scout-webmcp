@@ -1,4 +1,4 @@
-# Methodology
+# Methodology: scout-lab-v1.1
 
 ## Normalization
 
@@ -6,9 +6,9 @@ Card identity is a deterministic key over normalized name, set code/name, number
 
 ## Comparable sales
 
-Listings and sales are deduplicated first. Exact same-card and same-tier sales are ordered by completion time. Scout reports the latest exact sale immediately, but requires at least three relevant transactions to publish rolling medians.
+Listings are deduplicated by exact-market-scoped provider ID, case-sensitive source URL, or certification evidence. Sales are deduplicated by provider transaction ID within the same mode, market, and currency; equal price and date are not enough to merge them. Exact same-card and same-tier sales are ordered by completion time. Scout reports the latest exact sale immediately, but requires at least three non-anomalous transactions in the corresponding window to publish rolling medians.
 
-The 90-day series uses total sold cost (price plus known shipping). With five or more observations, extreme log-price deviations are identified with a median absolute deviation threshold of 3.5. Anomalies remain visible by ID but are excluded from robust medians and cleaned ranges. A recency-weighted 90-day median uses exponential decay with a 45-day scale.
+The 90-day series uses total sold cost (price plus known shipping). With five or more observations, extreme log-price deviations are identified with a median absolute deviation threshold of 3.5. Anomalies remain visible by ID but are excluded from robust medians and cleaned ranges. When the median absolute deviation is zero, prices departing by more than a factor of 1.5 from the median are flagged. The 30-day median uses the same anomaly exclusions. Raw counts retain flagged transactions; cleaned counts and liquidity exclude them. Sales dated after the snapshot are excluded, and invalid dates or non-positive item prices are discarded. A recency-weighted 90-day median uses exponential decay with a 45-day scale.
 
 Confidence combines exact-match quality (35%), sample size (25%), recency (20%), and cleaned interquartile dispersion (20%). Match quality is fixed at 100 only because the current engine admits exact canonical/tier matches; future fallback matches must lower this component and explain why.
 

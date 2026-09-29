@@ -10,13 +10,17 @@ import type {
 export interface CatalogProvider {
   readonly status: ProviderStatus;
   searchCatalog(query: string): Promise<CardIdentity[]> | CardIdentity[];
-  getCard(cardId: string): Promise<CardIdentity | undefined> | CardIdentity | undefined;
+  getCard(
+    cardId: string,
+  ): Promise<CardIdentity | undefined> | CardIdentity | undefined;
 }
 
 export interface MarketplaceProvider {
   readonly status: ProviderStatus;
   getListings(): Promise<MarketplaceListing[]> | MarketplaceListing[];
-  getListing(listingId: string): Promise<MarketplaceListing | undefined> | MarketplaceListing | undefined;
+  getListing(
+    listingId: string,
+  ): Promise<MarketplaceListing | undefined> | MarketplaceListing | undefined;
 }
 
 export interface SalesHistoryProvider {
@@ -31,7 +35,8 @@ export interface SellerProvider {
 }
 
 export interface ScoutProvider
-  extends CatalogProvider,
+  extends
+    CatalogProvider,
     MarketplaceProvider,
     SalesHistoryProvider,
     SellerProvider {

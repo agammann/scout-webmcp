@@ -1,4 +1,4 @@
-# Phase 2 priorities
+# Future live-data work (not implemented)
 
 1. Re-verify current provider terms and complete one approved live vertical slice, starting with the provider that can legitimately expose both listing and seller evidence. Add signed data-access decision records.
 2. Move providers, credentials, validation, caching, rate limits, and scoring to a server deployment. Keep the browser client free of secrets.
@@ -8,5 +8,4 @@
 6. Add licensed card imagery, certification verification, and population evidence only where terms permit.
 7. Expand seller-review analysis with evidence snippets and cautious theme summaries; never auto-label a seller as fraudulent.
 8. Add authentication, saved searches, alerts, freshness indicators, accessibility audits, observability, and production incident controls.
-9. Add provider contract fixtures, database integration tests, API abuse tests, Playwright browser tests, and live-provider sandbox tests before enabling `LIVE`.
-
+9. Add provider contract fixtures, database integration tests, API abuse tests, additional browser coverage, and live-provider sandbox tests before enabling `LIVE`.

@@ -13,13 +13,15 @@ export function assessListingRisks(
   sellerTrust: SellerTrustAssessment,
 ): ListingRisk[] {
   const risks: ListingRisk[] = [];
-  const total = listing.price.amountCents + (listing.shipping?.amountCents ?? 0);
+  const total =
+    listing.price.amountCents + (listing.shipping?.amountCents ?? 0);
   if (market.median90 && total < market.median90.amountCents * 0.7) {
     risks.push({
       code: 'PRICE_FAR_BELOW_MARKET',
       label: 'Price unusually below market',
       severity: 'HIGH',
-      evidence: 'Known acquisition cost is more than 30% below the exact 90-day median.',
+      evidence:
+        'Known acquisition cost is more than 30% below the exact 90-day median.',
     });
   }
   if (listing.usesStockPhoto) {
@@ -27,7 +29,8 @@ export function assessListingRisks(
       code: 'STOCK_PHOTO',
       label: 'Stock-photo evidence only',
       severity: 'MEDIUM',
-      evidence: 'The provider record indicates a stock image rather than item-specific photos.',
+      evidence:
+        'The provider record indicates a stock image rather than item-specific photos.',
     });
   }
   if (listing.imageCount < 3) {
@@ -88,7 +91,8 @@ export function assessListingRisks(
       code: 'IDENTITY_AMBIGUITY',
       label: 'Possible wrong card or variant',
       severity: 'HIGH',
-      evidence: 'The listing title omits the canonical set code or card number.',
+      evidence:
+        'The listing title omits the canonical set code or card number.',
     });
   }
   if (listing.tier.kind === 'GRADED' && !listing.tier.certificationNumber) {
@@ -96,7 +100,8 @@ export function assessListingRisks(
       code: 'CERT_NOT_PROVIDED',
       label: 'Certification number not provided',
       severity: 'LOW',
-      evidence: 'Grade-specific comparison is available, but no certification number was supplied.',
+      evidence:
+        'Grade-specific comparison is available, but no certification number was supplied.',
     });
   }
   if (listing.description.toLowerCase().includes('variant not confirmed')) {
@@ -112,9 +117,9 @@ export function assessListingRisks(
       code: 'NO_AUTOMATED_ALERTS',
       label: 'No automated warning triggered',
       severity: 'INFO',
-      evidence: 'Automated checks found no configured alert. This is not an authenticity guarantee.',
+      evidence:
+        'Automated checks found no configured alert. This is not an authenticity guarantee.',
     });
   }
   return risks;
 }
-

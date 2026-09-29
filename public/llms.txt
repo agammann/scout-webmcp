@@ -1,50 +1,24 @@
 # Scout
 
-> Scout is a transparent, synthetic-only collectible card buying assistant for people and browser agents. It keeps exact card, variant, condition, grading company, and numeric grade tiers separate before comparing prices.
+> A free fictional card comparison lab for people and browser agents. Every card, seller, listing, sale, and price is synthetic. No live marketplace is connected.
 
-## What Scout provides
+The fixed sample is dated August 29, 2026. Use keyword searches such as Ember Dragon ex, Volt Lynx PSA 10, or Tide Oracle raw. Search filters apply to matching listings. Raw/graded tier summaries remain separate. Reload resets selections.
 
-- Normalized card search with exact raw and graded market tiers.
-- Current synthetic listings with item price, known shipping, and total acquisition cost.
-- Latest exact comparable sale plus robust 30-day and 90-day market statistics.
-- Inspectable Deal Score, Seller Trust, confidence, and listing-risk evidence.
-- Side-by-side listing comparison and raw-versus-graded analysis.
+## Page-side WebMCP tools
 
-## WebMCP tools
+- search_cards: keyword search and exact grade, budget, trust, discount filters; returns matching listing IDs grouped by card.
+- get_card_market_state: all exact-tier statistics and listings for a canonical card.
+- assess_listing: one listing's costs, scores, seller evidence, and risks.
+- compare_listings: two to five unique listing IDs; withheld scores cannot select a winner.
+- find_deals: the same filters returning listings, with optional query.
+- compare_raw_vs_graded: separate raw conditions and graded company/grade tiers.
 
-- `search_cards` searches normalized cards and returns the strongest exact-tier listing for each card.
-- `get_card_market_state` returns listings, exact comparable-sale statistics, scores, and risks for one normalized card.
-- `assess_listing` explains one listing's cost, comps, Deal Score, Seller Trust, and warnings.
-- `compare_listings` compares two to five listings using aligned market and seller evidence.
-- `find_deals` filters listings by budget, grade, trust, and below-market criteria.
-- `compare_raw_vs_graded` contrasts exact raw and company-and-grade-specific market tiers without pooling them.
+Tools register through document.modelContext when available. They are read-only over the sample, return synthetic provenance and limitations, and update the visible workspace. Manual workflows work without WebMCP. This is not a remote MCP server.
 
-All six tools are read-only and use the same deterministic service as the visible React interface.
+## Boundaries
 
-## Examples
+Known shipping is included; taxes and unknown shipping are excluded. A rolling median needs three non-anomalous exact sales. Scores illustrate a methodology and do not value or authenticate real cards. No accounts, saved searches, imports, purchases, or live-provider integrations are implemented.
 
-- Find a CGC 10 Ember Dragon ex below its 90-day median.
-- Show PSA 10 cards under $500 from sellers with a trust score of at least 85.
-- Compare a raw Near Mint card with its PSA 9 and PSA 10 market tiers.
-
-## Data provenance and limitations
-
-- Every card, seller, marketplace, listing, sale, review, and price in the current build is fictional synthetic demonstration data.
-- No live marketplace is connected, and synthetic records are never represented as production marketplace data.
-- Scout is decision support, not an authenticity guarantee, investment recommendation, or promise of profit.
-- Scout is not affiliated with Pokémon, Nintendo, The Pokémon Company, or any marketplace.
-
-## Links
-
-- [Live application](https://scout-webmcp-2026.alx21.chatgpt.site/)
-- [Public source](https://github.com/agammann/scout-webmcp)
-- [WebMCP Challenge submission](https://devpost.com/software/cardscout)
-- [Narrated demo](https://www.youtube.com/watch?v=akGIr6avM3g)
-
-## Contact
-
-- Report product or documentation issues through the [public GitHub repository](https://github.com/agammann/scout-webmcp/issues).
-
-## Updates
-
-- The public repository is the source of truth for implementation changes, methodology updates, and release history.
+[Open Scout](https://scout-webmcp-2026.alx21.chatgpt.site/)
+[Source and usage](https://github.com/agammann/scout-webmcp)
+[Issues](https://github.com/agammann/scout-webmcp/issues)

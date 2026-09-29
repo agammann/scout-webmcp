@@ -1,21 +1,16 @@
-# Data-source decisions
+# Data sources
 
-Status reflects the Phase 1 implementation and must be re-verified against current provider documentation and contracts before production use.
+Scout currently loads only bundled, fictional fixtures from `src/providers/demo/data.ts`.
 
-| Source | Realistic role | Phase 1 status | Key limitation |
-| --- | --- | --- | --- |
-| eBay developer APIs | Current listings; seller metadata where exposed | Adapter contract and disabled credential config only | Production access, approval, scopes, rate limits, and sold-comparable availability must be verified; no scraping fallback |
-| TCGplayer | Catalog and price aggregates for approved partners | Not implemented | New API access and permitted fields may be restricted; aggregates are not individual completed sales |
-| PriceCharting | Licensed price guide/catalog where a commercial plan permits | Not implemented | Terms, attribution, granularity, and grade/variant matching require commercial review |
-| Cardmarket | EU listings/price information for authorized applications | Not implemented | Access, regional scope, personal-data handling, and sold-history fields require approval |
-| Mercari | Provider slot only | Not implemented | No public production integration is assumed |
-| Whatnot | Provider slot only | Not implemented | No public production integration is assumed |
-| Fanatics Collect | Provider slot only | Not implemented | No public production integration is assumed |
-| PSA/BGS/CGC | Certification or population evidence where officially permitted | Not implemented | Availability and terms vary; never automate restricted verification pages |
+| Source                                  | Implemented behavior                                                           |
+| --------------------------------------- | ------------------------------------------------------------------------------ |
+| HoloForge Demo                          | Fictional catalog, listing, seller, and sale records.                          |
+| Collector Circuit Demo                  | Fictional catalog, listing, seller, and sale records.                          |
+| eBay                                    | Disabled configuration scaffolding; no request or live adapter is implemented. |
+| Other marketplaces and grading services | No integration.                                                                |
 
-No endpoint, credential, seller rating, listing, or completed sale is fabricated. A source that cannot supply individual sold transactions must be labeled as aggregate guidance and cannot populate `latestSale` or transaction counts.
+The sample has three cards, ten listings after deduplication, and nine exact tiers. Every record carries synthetic provenance, and source URLs use `.invalid`. The fixed as-of timestamp is `2026-08-29T12:00:00.000Z`.
 
-## Phase 1 demo provider
+Do not use this sample to estimate real card prices. It is for exploring the calculations and testing browser-agent workflows.
 
-`demo-holoforge` and `demo-collector-circuit` are fictional adapters. Every record is `SYNTHETIC`, every seller name includes `(Demo)`, and URLs use the reserved `.invalid` domain. They demonstrate the full workflow without implying real data access.
-
+Any future live integration requires current official API documentation, permitted access, data-display rights, server-side credentials, input validation, and real integration tests. These prerequisites have not been implemented or established by this release. A provider's aggregate guide price cannot stand in for an individual sale or populate transaction counts.

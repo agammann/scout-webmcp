@@ -10,7 +10,8 @@ import type {
 import { addMoney, subtractMoney } from './money';
 
 const clamp = (value: number) => Math.max(0, Math.min(100, value));
-const logisticPriceScore = (discountRatio: number) => 100 / (1 + Math.exp(-10 * discountRatio));
+const logisticPriceScore = (discountRatio: number) =>
+  100 / (1 + Math.exp(-10 * discountRatio));
 
 function classify(score: number | null): DealAssessment['classification'] {
   if (score === null) return 'WITHHELD';
@@ -33,8 +34,11 @@ export function assessDeal(
   const latestTotal = market.latestSale
     ? addMoney(market.latestSale.price, market.latestSale.shipping)
     : undefined;
-  const discountRatio = median90 ? (median90.amountCents - total.amountCents) / median90.amountCents : undefined;
-  const priceScore = discountRatio === undefined ? 0 : clamp(logisticPriceScore(discountRatio));
+  const discountRatio = median90
+    ? (median90.amountCents - total.amountCents) / median90.amountCents
+    : undefined;
+  const priceScore =
+    discountRatio === undefined ? 0 : clamp(logisticPriceScore(discountRatio));
   const listingQuality = clamp(
     Math.min(50, listing.imageCount * 8) +
       (listing.description.length >= 60 ? 20 : 8) +
@@ -85,26 +89,44 @@ export function assessDeal(
       label: 'Market liquidity',
       score: market.liquidityScore,
       weight: 10,
-      explanation: `${market.count90} exact sales in the 90-day window.`,
+      explanation: `${market.cleanedCount90} non-anomalous exact sales in the 90-day window.`,
       available: true,
     },
   ];
 
-  const marketComponents = components.filter((component) => component.key !== 'seller' && component.available);
-  const marketWeight = marketComponents.reduce((sum, component) => sum + component.weight, 0);
+  const marketComponents = components.filter(
+    (component) => component.key !== 'seller' && component.available,
+  );
+  const marketWeight = marketComponents.reduce(
+    (sum, component) => sum + component.weight,
+    0,
+  );
   const marketDealScore = median90
     ? Math.round(
-        marketComponents.reduce((sum, component) => sum + component.score * component.weight, 0) /
-          marketWeight,
+        marketComponents.reduce(
+          (sum, component) => sum + component.score * component.weight,
+          0,
+        ) / marketWeight,
       )
     : null;
   const score =
     median90 && sellerTrust.score !== null
-      ? Math.round(components.reduce((sum, component) => sum + component.score * component.weight, 0) / 100)
+      ? Math.round(
+          components.reduce(
+            (sum, component) => sum + component.score * component.weight,
+            0,
+          ) / 100,
+        )
       : null;
   const reasons = components.map((component) => component.explanation);
-  if (score !== null && seller.recentNegative !== undefined && seller.recentNegative > 0) {
-    reasons.push(`${seller.recentNegative} recent negative seller ratings remain visible as risk evidence.`);
+  if (
+    score !== null &&
+    seller.recentNegative !== undefined &&
+    seller.recentNegative > 0
+  ) {
+    reasons.push(
+      `${seller.recentNegative} recent negative seller ratings remain visible as risk evidence.`,
+    );
   }
 
   return {
@@ -113,17 +135,24 @@ export function assessDeal(
     marketDealScore,
     classification: classify(score),
     totalAcquisition: total,
-    differenceFromLatest: latestTotal ? subtractMoney(total, latestTotal) : undefined,
-    percentFromLatest: latestTotal
-      ? ((total.amountCents - latestTotal.amountCents) / latestTotal.amountCents) * 100
+    differenceFromLatest: latestTotal
+      ? subtractMoney(total, latestTotal)
       : undefined,
-    differenceFromMedian90: median90 ? subtractMoney(total, median90) : undefined,
+    percentFromLatest: latestTotal
+      ? ((total.amountCents - latestTotal.amountCents) /
+          latestTotal.amountCents) *
+        100
+      : undefined,
+    differenceFromMedian90: median90
+      ? subtractMoney(total, median90)
+      : undefined,
     percentFromMedian90: median90
-      ? ((total.amountCents - median90.amountCents) / median90.amountCents) * 100
+      ? ((total.amountCents - median90.amountCents) / median90.amountCents) *
+        100
       : undefined,
     components,
     reasons,
-    methodologyVersion: 'deal-score-v1.0',
+    methodologyVersion: 'deal-score-v1.1',
   };
 }
 
@@ -138,4 +167,3 @@ export function scoreLabel(score: number | null): string {
     .map((word) => word[0].toUpperCase() + word.slice(1))
     .join(' ');
 }
-

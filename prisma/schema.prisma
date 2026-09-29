@@ -174,4 +174,3 @@ model DealAssessment {
 
   @@index([dataMode, score, assessedAt])
 }
-

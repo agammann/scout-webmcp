@@ -37,7 +37,9 @@ async function listFiles(directory) {
 
 const assetFiles = (await listFiles(distRoot)).filter((path) => {
   const relativePath = relative(distRoot, path).split(sep).join('/');
-  return !relativePath.startsWith('server/') && !relativePath.startsWith('.openai/');
+  return (
+    !relativePath.startsWith('server/') && !relativePath.startsWith('.openai/')
+  );
 });
 
 const embeddedAssets = {};
@@ -45,11 +47,16 @@ for (const path of assetFiles) {
   const relativePath = relative(distRoot, path).split(sep).join('/');
   embeddedAssets[`/${relativePath}`] = {
     body: (await readFile(path)).toString('base64'),
-    contentType: contentTypes[extname(path).toLowerCase()] ?? 'application/octet-stream',
+    contentType:
+      contentTypes[extname(path).toLowerCase()] ?? 'application/octet-stream',
   };
 }
 
-if (!embeddedAssets['/index.html']) throw new Error('The Vite build did not emit dist/index.html.');
+if (!embeddedAssets['/index.html'])
+  throw new Error('The Vite build did not emit dist/index.html.');
 
 await mkdir(serverRoot, { recursive: true });
-await writeFile(resolve(serverRoot, 'index.js'), createSitesWorker(embeddedAssets));
+await writeFile(
+  resolve(serverRoot, 'index.js'),
+  createSitesWorker(embeddedAssets),
+);

@@ -2,7 +2,7 @@
 
 ## Supported code
 
-Security fixes target the current default branch. Phase 1 contains no authentication, write API, payment flow, production database, or live marketplace credentials.
+Security fixes target the current default branch. Scout contains no authentication, write API, payment flow, production database, or live marketplace credentials.
 
 ## Reporting
 
@@ -18,7 +18,6 @@ Do not publish suspected vulnerabilities with secrets or personal data. Report t
 - Provider failures return safe errors without credentials, auth headers, internal stack traces, or raw upstream bodies.
 - CSP, secure headers, dependency pinning, automated auditing, and provenance/mode isolation are release gates.
 
-## Phase 1 boundaries
+## Runtime boundaries
 
-All data is local, synthetic, read-only, and shipped with the client. This is safe for judging but is not a live-data deployment architecture. Phase 2 moves ingestion, secrets, persistence, and live adapters behind a server boundary before real records are enabled.
-
+All data is local, synthetic, read-only, and shipped with the client. Live data would require moving ingestion, secrets, persistence, and live adapters behind a server boundary before real records are enabled.

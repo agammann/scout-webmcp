@@ -50,12 +50,8 @@ export default {
       return responseFor(embeddedAssets['/index.html'], request.method, '/index.html');
     }
 
-    const exactAsset = embeddedAssets[requestPath];
+    const exactAsset = Object.hasOwn(embeddedAssets, requestPath) ? embeddedAssets[requestPath] : undefined;
     if (exactAsset) return responseFor(exactAsset, request.method, requestPath);
-
-    if (request.headers.get('accept')?.includes('text/html')) {
-      return responseFor(embeddedAssets['/index.html'], request.method, '/index.html');
-    }
 
     return new Response('Not found', { status: 404, headers: securityHeaders });
   },

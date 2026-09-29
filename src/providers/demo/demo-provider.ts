@@ -1,5 +1,11 @@
 import { matchesSearch } from '@/src/domain/identity';
-import type { CardIdentity, MarketplaceListing, ProviderStatus, Sale, Seller } from '@/src/domain/types';
+import type {
+  CardIdentity,
+  MarketplaceListing,
+  ProviderStatus,
+  Sale,
+  Seller,
+} from '@/src/domain/types';
 import type { ScoutProvider } from '@/src/providers/contracts';
 
 import {
@@ -34,7 +40,8 @@ export class DemoMarketplaceProvider implements ScoutProvider {
         sellerReviews: false,
         population: false,
       },
-      limitation: 'Fictional records created only to demonstrate Scout behavior.',
+      limitation:
+        'Fictional records created only to demonstrate Scout behavior.',
     };
   }
 

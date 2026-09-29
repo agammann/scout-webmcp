@@ -6,62 +6,61 @@ export interface DedupeResult<T> {
   duplicateGroups: string[][];
 }
 
-export function dedupeListings(listings: MarketplaceListing[]): DedupeResult<MarketplaceListing> {
-  const seen = new Map<string, MarketplaceListing>();
-  const groups = new Map<string, string[]>();
-
-  for (const listing of listings) {
-    const keys = [
-      `external:${listing.providerId}:${listing.externalId}`,
-      listing.sourceUrl ? `url:${listing.sourceUrl.toLowerCase()}` : undefined,
-      listing.tier.kind === 'GRADED' && listing.tier.certificationNumber
-        ? `cert:${listing.tier.company}:${listing.tier.certificationNumber}`
-        : undefined,
-    ].filter((key): key is string => Boolean(key));
-
-    const existingKey = keys.find((key) => seen.has(key));
-    if (existingKey) {
-      const existing = seen.get(existingKey)!;
-      const groupKey = `group:${existing.id}`;
-      const group = groups.get(groupKey) ?? [existing.id];
-      group.push(listing.id);
-      groups.set(groupKey, group);
-      continue;
+// Connected components preserve aliases even when a later record links two groups.
+function dedupe<T extends { id: string }>(
+  records: T[],
+  keysFor: (record: T) => string[],
+): DedupeResult<T> {
+  const parents = records.map((_, index) => index);
+  const root = (index: number): number =>
+    parents[index] === index ? index : (parents[index] = root(parents[index]));
+  const seen = new Map<string, number>();
+  records.forEach((record, index) => {
+    for (const key of keysFor(record)) {
+      const previous = seen.get(key);
+      if (previous !== undefined) {
+        const a = root(index);
+        const b = root(previous);
+        parents[Math.max(a, b)] = Math.min(a, b);
+      }
+      seen.set(key, index);
     }
-    for (const key of keys) seen.set(key, listing);
-  }
+  });
+  const groups = new Map<number, T[]>();
+  records.forEach((record, index) => {
+    const key = root(index);
+    groups.set(key, [...(groups.get(key) ?? []), record]);
+  });
+  return {
+    unique: [...groups.values()].map((group) => group[0]),
+    duplicateGroups: [...groups.values()]
+      .filter((group) => group.length > 1)
+      .map((group) => group.map((record) => record.id)),
+  };
+}
 
-  const duplicateIds = new Set([...groups.values()].flatMap((group) => group.slice(1)));
-  const unique = listings.filter((listing) => !duplicateIds.has(listing.id));
-  return { unique, duplicateGroups: [...groups.values()] };
+export function dedupeListings(
+  listings: MarketplaceListing[],
+): DedupeResult<MarketplaceListing> {
+  return dedupe(listings, (listing) => {
+    const scope = `${listing.provenance.dataMode}:${exactMarketKey(listing.identity, listing.tier)}:${listing.price.currency}`;
+    return [
+      `${scope}:external:${listing.providerId}:${listing.externalId}`,
+      // URL paths are case-sensitive. Never lowercase a complete source URL.
+      ...(listing.sourceUrl ? [`${scope}:url:${listing.sourceUrl}`] : []),
+      ...(listing.tier.kind === 'GRADED' && listing.tier.certificationNumber
+        ? [
+            `${scope}:cert:${listing.tier.company}:${listing.tier.certificationNumber}`,
+          ]
+        : []),
+    ];
+  });
 }
 
 export function dedupeSales(sales: Sale[]): DedupeResult<Sale> {
-  const seen = new Map<string, Sale>();
-  const groups = new Map<string, string[]>();
-  const unique: Sale[] = [];
-
-  for (const sale of sales) {
-    const exact = `external:${sale.providerId}:${sale.externalId}`;
-    const fallback = [
-      exactMarketKey(sale.identity, sale.tier),
-      sale.soldAt.slice(0, 10),
-      sale.price.currency,
-      sale.price.amountCents,
-      sale.shipping?.amountCents ?? 0,
-      sale.sourceUrl ?? '',
-    ].join('|');
-    const key = seen.has(exact) ? exact : fallback;
-    const existing = seen.get(key);
-    if (existing) {
-      const groupKey = `group:${existing.id}`;
-      groups.set(groupKey, [...(groups.get(groupKey) ?? [existing.id]), sale.id]);
-      continue;
-    }
-    seen.set(exact, sale);
-    seen.set(fallback, sale);
-    unique.push(sale);
-  }
-  return { unique, duplicateGroups: [...groups.values()] };
+  // Same price/day/certification does not establish the same transaction.
+  // A listing URL can be reused for multiple sales; use the provider transaction ID.
+  return dedupe(sales, (sale) => [
+    `${sale.provenance.dataMode}:${sale.providerId}:${sale.externalId}:${exactMarketKey(sale.identity, sale.tier)}:${sale.price.currency}`,
+  ]);
 }
-

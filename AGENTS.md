@@ -1,6 +1,6 @@
 # Scout engineering contract
 
-This file governs all work in this repository. Phase 1 is a synthetic-only vertical slice for the OpenAI WebMCP Challenge.
+This file governs all work in this repository. Scout is a public, synthetic-only card comparison lab.
 
 ## Commands
 
@@ -9,9 +9,10 @@ This file governs all work in this repository. Phase 1 is a synthetic-only verti
 - `pnpm lint` — Oxlint correctness and security-adjacent static checks.
 - `pnpm typecheck` — strict TypeScript validation.
 - `pnpm build` — production Vite/Sites build.
+- `pnpm test:e2e` — Chromium workflows against the production worker.
 - `pnpm security:audit` — dependency audit at high severity.
 
-All five verification commands must pass before a release. Add a regression test with every business-logic fix.
+All six verification commands must pass before a release. Add a regression test with every business-logic fix.
 
 ## Architecture rules
 
@@ -22,7 +23,7 @@ All five verification commands must pass before a release. Add a regression test
 5. A provider without documented, permitted access stays disabled. Environment placeholders are not an integration. Do not scrape, evade CAPTCHA, bypass authentication, or defeat rate limits.
 6. Keep scoring functions deterministic and side-effect free. Methodology versions travel with API and WebMCP results.
 7. WebMCP tools are a first-class interface over the same service used by React. Do not create a second business-logic path for agents.
-8. Phase 1 is a read-only browser application. A future server/API owns credentials, persistence, rate limiting, scheduled ingestion, and live-provider calls.
+8. Scout is a read-only browser application. A future server/API owns credentials, persistence, rate limiting, scheduled ingestion, and live-provider calls.
 9. Register tools through the current `document.modelContext` API with one lifecycle `AbortSignal`, human-readable titles, `readOnlyHint`, and `untrustedContentHint`. Abort registrations on page teardown and handle registration failures without exposing secrets. Do not regress to the legacy navigator API or add a nonstandard discovery manifest without a documented compatibility decision and runtime-parity tests.
 
 ## Card normalization invariants

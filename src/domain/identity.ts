@@ -2,17 +2,21 @@ import type { CardIdentity, GradedTier, MarketTier, RawTier } from './types';
 
 const normalizeToken = (value: string) =>
   value
-    .normalize('NFKD')
+    .normalize('NFKC')
     .toLowerCase()
-    .replace(/[^a-z0-9.]+/g, ' ')
+    .replace(/[^\p{L}\p{N}.]+/gu, ' ')
     .trim()
     .replace(/\s+/g, '-');
 
 export function cardVariantKey(card: CardIdentity): string {
   return [
     card.name,
+    card.setName,
     card.setCode,
     card.cardNumber,
+    card.releaseYear,
+    card.rarity,
+    card.promo,
     card.variant,
     card.finish,
     card.edition,
@@ -27,14 +31,17 @@ export function marketTierKey(tier: MarketTier): string {
   if (tier.kind === 'RAW') {
     return `raw:${normalizeToken(tier.condition)}`;
   }
-  return `graded:${tier.company.toLowerCase()}:${tier.grade.toFixed(1)}`;
+  return `graded:${tier.company.toLowerCase()}:${String(tier.grade)}`;
 }
 
 export function exactMarketKey(card: CardIdentity, tier: MarketTier): string {
   return `${cardVariantKey(card)}::${marketTierKey(tier)}`;
 }
 
-export function sameCardVariant(left: CardIdentity, right: CardIdentity): boolean {
+export function sameCardVariant(
+  left: CardIdentity,
+  right: CardIdentity,
+): boolean {
   return cardVariantKey(left) === cardVariantKey(right);
 }
 
@@ -52,14 +59,17 @@ export function isRawTier(tier: MarketTier): tier is RawTier {
 
 export function tokenizeSearch(query: string): string[] {
   return query
-    .normalize('NFKD')
+    .normalize('NFKC')
     .toLowerCase()
-    .replace(/[^a-z0-9.]+/g, ' ')
+    .replace(/[^\p{L}\p{N}.]+/gu, ' ')
     .split(/\s+/)
     .filter(Boolean);
 }
 
-export function searchableIdentity(card: CardIdentity, tier?: MarketTier): string {
+export function searchableIdentity(
+  card: CardIdentity,
+  tier?: MarketTier,
+): string {
   const values = [
     card.name,
     card.setName,
@@ -73,13 +83,22 @@ export function searchableIdentity(card: CardIdentity, tier?: MarketTier): strin
     card.language,
     card.printing,
   ];
-  if (tier?.kind === 'RAW') values.push('raw', tier.condition.replaceAll('_', ' '));
-  if (tier?.kind === 'GRADED') values.push('graded', tier.company, String(tier.grade));
+  if (tier?.kind === 'RAW')
+    values.push('raw', tier.condition.replaceAll('_', ' '));
+  if (tier?.kind === 'GRADED')
+    values.push('graded', tier.company, String(tier.grade));
   return values.join(' ').toLowerCase();
 }
 
-export function matchesSearch(card: CardIdentity, tier: MarketTier, query: string): boolean {
-  const haystack = searchableIdentity(card, tier);
-  return tokenizeSearch(query).every((token) => haystack.includes(token));
+export function matchesSearch(
+  card: CardIdentity,
+  tier: MarketTier,
+  query: string,
+): boolean {
+  const tokens = tokenizeSearch(searchableIdentity(card, tier));
+  return tokenizeSearch(query).every((token) =>
+    /^\d/.test(token)
+      ? tokens.includes(token)
+      : tokens.some((word) => word.includes(token)),
+  );
 }
-

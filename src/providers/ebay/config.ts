@@ -21,14 +21,15 @@ export const ebayProviderStatus: ProviderStatus = {
     population: false,
   },
   limitation:
-    'Disabled in Phase 1. Production Browse API access, OAuth credentials, display rights, and a server-side runtime are required. Sold history is a separate restricted capability.',
+    'Disabled. Production Browse API access, OAuth credentials, display rights, and a server-side runtime are required. Sold history is a separate restricted capability.',
 };
 
-export function validateEbayEnvironment(environment: EbayProviderEnvironment): string[] {
+export function validateEbayEnvironment(
+  environment: EbayProviderEnvironment,
+): string[] {
   const missing: string[] = [];
   if (!environment.EBAY_CLIENT_ID) missing.push('EBAY_CLIENT_ID');
   if (!environment.EBAY_CLIENT_SECRET) missing.push('EBAY_CLIENT_SECRET');
   if (!environment.EBAY_MARKETPLACE_ID) missing.push('EBAY_MARKETPLACE_ID');
   return missing;
 }
-

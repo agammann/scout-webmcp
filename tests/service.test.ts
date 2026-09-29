@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { CardMarketService, createDemoCardMarketService } from '@/src/services/card-market-service';
-import { DEMO_AS_OF, demoCards, demoListings, demoSales, demoSellers } from '@/src/providers/demo/data';
+import {
+  CardMarketService,
+  createDemoCardMarketService,
+} from '@/src/services/card-market-service';
+import {
+  DEMO_AS_OF,
+  demoCards,
+  demoListings,
+  demoSales,
+  demoSellers,
+} from '@/src/providers/demo/data';
 
 describe('CardMarketService vertical slice', () => {
   it('groups listings by normalized card and removes duplicate listing exposure', () => {
@@ -34,14 +43,21 @@ describe('CardMarketService vertical slice', () => {
 
   it('compares two to five unique listings and rejects invalid comparison sizes', () => {
     const service = createDemoCardMarketService();
-    const result = service.compareListings(['listing-hf-1042', 'listing-cc-8841']);
+    const result = service.compareListings([
+      'listing-hf-1042',
+      'listing-cc-8841',
+    ]);
     expect(result.data.assessments).toHaveLength(2);
     expect(result.data.strongestListingId).toBeDefined();
-    expect(() => service.compareListings(['listing-hf-1042'])).toThrow(/between 2 and 5/);
+    expect(() => service.compareListings(['listing-hf-1042'])).toThrow(
+      /between 2 and 5/,
+    );
   });
 
   it('shows raw and graded tiers separately', () => {
-    const result = createDemoCardMarketService().compareRawVsGraded('card-ember-dragon-ex');
+    const result = createDemoCardMarketService().compareRawVsGraded(
+      'card-ember-dragon-ex',
+    );
     expect(result.data.raw).toHaveLength(1);
     expect(result.data.graded).toHaveLength(4);
     expect(result.data.note).toMatch(/never pooled/);
@@ -77,4 +93,3 @@ describe('CardMarketService vertical slice', () => {
     ).toThrow(/only SYNTHETIC/);
   });
 });
-

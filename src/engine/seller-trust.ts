@@ -1,4 +1,8 @@
-import type { ScoreComponent, Seller, SellerTrustAssessment } from '@/src/domain/types';
+import type {
+  ScoreComponent,
+  Seller,
+  SellerTrustAssessment,
+} from '@/src/domain/types';
 
 const clamp = (value: number) => Math.max(0, Math.min(100, value));
 
@@ -8,7 +12,8 @@ function wilsonLowerBound(positive: number, total: number, z = 1.96): number {
   const denominator = 1 + (z * z) / total;
   const centre = proportion + (z * z) / (2 * total);
   const margin =
-    z * Math.sqrt((proportion * (1 - proportion) + (z * z) / (4 * total)) / total);
+    z *
+    Math.sqrt((proportion * (1 - proportion) + (z * z) / (4 * total)) / total);
   return (centre - margin) / denominator;
 }
 
@@ -25,25 +30,37 @@ export function assessSellerTrust(seller: Seller): SellerTrustAssessment {
       key: 'feedback',
       label: 'Feedback confidence',
       score:
-        seller.feedbackPercent !== undefined && seller.feedbackCount !== undefined
+        seller.feedbackPercent !== undefined &&
+        seller.feedbackCount !== undefined
           ? clamp(
               wilsonLowerBound(
-                Math.round((seller.feedbackPercent / 100) * seller.feedbackCount),
+                Math.round(
+                  (seller.feedbackPercent / 100) * seller.feedbackCount,
+                ),
                 seller.feedbackCount,
               ) * 100,
             )
           : 0,
       weight: 35,
       explanation:
-        seller.feedbackPercent !== undefined && seller.feedbackCount !== undefined
+        seller.feedbackPercent !== undefined &&
+        seller.feedbackCount !== undefined
           ? `${seller.feedbackPercent}% across ${seller.feedbackCount.toLocaleString()} ratings, adjusted for sample size.`
           : 'Feedback evidence is unavailable.',
-      available: seller.feedbackPercent !== undefined && seller.feedbackCount !== undefined,
+      available:
+        seller.feedbackPercent !== undefined &&
+        seller.feedbackCount !== undefined,
     },
     {
       key: 'volume',
       label: 'Transaction volume',
-      score: seller.transactionCount !== undefined ? clamp((Math.log10(seller.transactionCount + 1) / Math.log10(5001)) * 100) : 0,
+      score:
+        seller.transactionCount !== undefined
+          ? clamp(
+              (Math.log10(seller.transactionCount + 1) / Math.log10(5001)) *
+                100,
+            )
+          : 0,
       weight: 15,
       explanation:
         seller.transactionCount !== undefined
@@ -56,7 +73,11 @@ export function assessSellerTrust(seller: Seller): SellerTrustAssessment {
       label: 'Recent rating mix',
       score:
         recentTotal !== undefined && recentTotal > 0
-          ? clamp(100 - ((seller.recentNegative ?? 0) / recentTotal) * 550 - ((seller.recentNeutral ?? 0) / recentTotal) * 150)
+          ? clamp(
+              100 -
+                ((seller.recentNegative ?? 0) / recentTotal) * 550 -
+                ((seller.recentNeutral ?? 0) / recentTotal) * 150,
+            )
           : 0,
       weight: 15,
       explanation:
@@ -68,7 +89,10 @@ export function assessSellerTrust(seller: Seller): SellerTrustAssessment {
     {
       key: 'tenure',
       label: 'Account tenure',
-      score: seller.accountAgeYears !== undefined ? clamp((seller.accountAgeYears / 8) * 100) : 0,
+      score:
+        seller.accountAgeYears !== undefined
+          ? clamp((seller.accountAgeYears / 8) * 100)
+          : 0,
       weight: 10,
       explanation:
         seller.accountAgeYears !== undefined
@@ -85,12 +109,16 @@ export function assessSellerTrust(seller: Seller): SellerTrustAssessment {
           : 0,
       weight: 10,
       explanation: `${seller.returnsAccepted ? 'Returns accepted' : 'Returns not accepted or unknown'}; ${seller.verified ? 'platform verification present' : 'no verification evidence'}.`,
-      available: seller.returnsAccepted !== undefined || seller.verified !== undefined,
+      available:
+        seller.returnsAccepted !== undefined || seller.verified !== undefined,
     },
     {
       key: 'relevance',
       label: 'Relevant selling history',
-      score: seller.relevantSalesCount !== undefined ? clamp((seller.relevantSalesCount / 30) * 100) : 0,
+      score:
+        seller.relevantSalesCount !== undefined
+          ? clamp((seller.relevantSalesCount / 30) * 100)
+          : 0,
       weight: 10,
       explanation:
         seller.relevantSalesCount !== undefined
@@ -118,12 +146,17 @@ export function assessSellerTrust(seller: Seller): SellerTrustAssessment {
   const weighted = components
     .filter((component) => component.available)
     .reduce((sum, component) => sum + component.score * component.weight, 0);
-  const score = coverage >= 0.55 ? Math.round(weighted / availableWeight) : null;
+  const score =
+    coverage >= 0.55 ? Math.round(weighted / availableWeight) : null;
   const warnings: string[] = [];
-  if ((seller.feedbackCount ?? 0) < 20) warnings.push('Very limited feedback history.');
-  if ((seller.recentNegative ?? 0) >= 3) warnings.push('Multiple recent negative ratings.');
-  if (seller.returnsAccepted === false) warnings.push('Returns are not accepted.');
-  if ((seller.accountAgeYears ?? 99) < 1) warnings.push('Account is less than one year old.');
+  if ((seller.feedbackCount ?? 0) < 20)
+    warnings.push('Very limited feedback history.');
+  if ((seller.recentNegative ?? 0) >= 3)
+    warnings.push('Multiple recent negative ratings.');
+  if (seller.returnsAccepted === false)
+    warnings.push('Returns are not accepted.');
+  if ((seller.accountAgeYears ?? 99) < 1)
+    warnings.push('Account is less than one year old.');
 
   return {
     sellerId: seller.id,
@@ -142,4 +175,3 @@ export function assessSellerTrust(seller: Seller): SellerTrustAssessment {
     methodologyVersion: 'seller-trust-v1.0',
   };
 }
-

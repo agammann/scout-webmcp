@@ -4,7 +4,9 @@ import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/components/ui/chart', () => ({
-  ChartContainer: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  ChartContainer: ({ children }: { children: ReactNode }) => (
+    <div>{children}</div>
+  ),
   ChartTooltip: () => null,
   ChartTooltipContent: () => null,
 }));
@@ -24,10 +26,11 @@ describe('Scout interface', () => {
     const user = userEvent.setup();
     render(<ScoutApp />);
 
-    expect(screen.getByText(/Every listing, sale, seller, and marketplace/).textContent).toMatch(/fictional synthetic/);
     expect(
-      screen.getByRole('link', { name: 'Watch Scout demo video' }).getAttribute('href'),
-    ).toBe('https://youtu.be/akGIr6avM3g');
+      screen.getByText(/Every listing, sale, seller, and marketplace/)
+        .textContent,
+    ).toMatch(/fictional synthetic/);
+    expect(screen.getByRole('button', { name: 'How it works' })).toBeDefined();
     const input = screen.getByTestId('search-input');
     await user.clear(input);
     await user.type(input, 'Volt Lynx PSA 10');
