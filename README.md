@@ -6,6 +6,14 @@ A free, browser-based **card comparison lab** for exploring exact card identity,
 
 [Open Scout](https://scout-webmcp-2026.alx21.chatgpt.site/) · [Usage guide](docs/DEMO.md) · [Calculation methodology](docs/METHODOLOGY.md) · [Report a problem](https://github.com/agammann/scout-webmcp/issues)
 
+## What you can learn
+
+- Keep card identity and raw/graded market tiers separate before comparing prices.
+- Explain how a score was calculated, and withhold it when evidence is insufficient.
+- Give people and browser agents the same service, validation, and visible results.
+
+To adapt the lab, start with the fictional records in [src/providers/demo/data.ts](src/providers/demo/data.ts), then run the checks below. Preserve exact identity, provenance, and the visible synthetic-data boundary. Adding a real provider requires a separate integration with permitted access; credentials alone do not enable one.
+
 ![Scout comparison workspace](docs/scout-desktop.png)
 
 ## Try it
@@ -52,16 +60,24 @@ Every successful tool result includes `SYNTHETIC` provenance, the fixed `asOf` d
 
 Tools are read-only over the sample data. Registration waits briefly for a late browser API, aborts on page teardown, and resumes after a browser back/forward cache restore. If registration fails, reload to retry; manual use remains available.
 
+### Native browser checks
+
+On September 30, 2026, the three native integration tests passed against the production Worker in **Chrome 154.0.8037.93** and **Edge 154.0.4258.48** on Windows with WebMCP testing enabled. They discover and execute all six tools, check synthetic provenance and visible results, reject invalid requests including repeated comparison IDs, and verify abort cleanup, actual back/forward cache restoration, and workspace reset after reload.
+
+For Chrome, enable `chrome://flags/#enable-webmcp-testing`, relaunch, and reload Scout. The page should report **6 agent tools ready**. See [Chrome's WebMCP setup guide](https://developer.chrome.com/docs/ai/webmcp) for current requirements. Other browser and agent combinations require their own verification. Chrome 154 takes JSON-stringified arguments in its native execution API; the test helper accounts for the [object-argument change in Chrome 155](https://developer.chrome.com/docs/ai/webmcp/imperative-api).
+
 ## Run and verify locally
 
-Use Node.js 24 and pnpm 11 (CI uses pnpm 11.19.0). There is no required `.env` file, database, or provider subscription.
+Use Git, Node.js 24, and pnpm 11.19.0, pinned in `package.json`. There is no required `.env` file, database, or provider subscription.
 
 ```sh
+git clone https://github.com/agammann/scout-webmcp.git
+cd scout-webmcp
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open `http://127.0.0.1:5173`. To inspect the production worker locally:
+Open the local URL printed by Vite. To inspect the production worker locally:
 
 ```sh
 pnpm build
@@ -78,9 +94,13 @@ pnpm build
 pnpm security:audit
 pnpm exec playwright install chromium
 pnpm test:e2e
+pnpm exec playwright install chrome
+pnpm test:webmcp
 ```
 
-CI runs these checks and installs Chromium's Linux system dependencies. Unit tests cover exact identity, deduplication, statistical windows, anomalies, score withholding, filters, provenance, and tool validation/lifecycle. Browser tests exercise search, empty results, comparisons, mobile navigation, and the six tool contracts with an injected API; that mock does not establish native WebMCP host support. Production build checks also exercise the generated Sites worker, discovery files, headers, missing assets, and rejected writes.
+CI runs these checks and installs Chromium and Chrome with their Linux system dependencies. Unit tests cover exact identity, deduplication, statistical windows, anomalies, score withholding, filters, provenance, and tool validation/lifecycle. Browser tests exercise search, empty results, comparisons, mobile navigation, and the six tool contracts with an injected API. The separate native suite calls the browser's actual `getTools` and `executeTool` methods without injecting a registration API; unavailable native support fails the check. Browser versions and navigation-restoration results are attached to its results and retained in CI artifacts. Production build checks also exercise the generated Sites worker, discovery files, headers, missing assets, and rejected writes.
+
+Set `SCOUT_WEBMCP_URL` in your shell to test an existing deployment with `pnpm test:webmcp`; this skips the local server. Tests use isolated browser contexts. Set `SCOUT_WEBMCP_CHANNEL=msedge` to use installed Edge. The deployment run records whether back/forward cache restoration occurred; the local Worker run requires it.
 
 ## Data, privacy, and limitations
 

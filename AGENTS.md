@@ -10,9 +10,10 @@ This file governs all work in this repository. Scout is a public, synthetic-only
 - `pnpm typecheck` — strict TypeScript validation.
 - `pnpm build` — production Vite/Sites build.
 - `pnpm test:e2e` — Chromium workflows against the production worker.
+- `pnpm test:webmcp` — native Chrome WebMCP discovery, execution, and lifecycle against the production worker.
 - `pnpm security:audit` — dependency audit at high severity.
 
-All six verification commands must pass before a release. Add a regression test with every business-logic fix.
+All seven verification commands must pass before a release. Add a regression test with every business-logic fix.
 
 ## Architecture rules
 
