@@ -281,6 +281,9 @@ export class CardMarketService {
 
   compareListings(listingIds: string[]): ResponseEnvelope<ComparisonResult> {
     const uniqueIds = [...new Set(listingIds)];
+    if (uniqueIds.length !== listingIds.length) {
+      throw new Error('Compare requires unique listing IDs.');
+    }
     if (uniqueIds.length < 2 || uniqueIds.length > 5) {
       throw new Error('Compare requires between 2 and 5 unique listing IDs.');
     }

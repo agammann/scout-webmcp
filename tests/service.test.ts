@@ -63,6 +63,16 @@ describe('CardMarketService vertical slice', () => {
     expect(result.data.note).toMatch(/never pooled/);
   });
 
+  it('rejects duplicate comparison IDs instead of silently removing them', () => {
+    expect(() =>
+      createDemoCardMarketService().compareListings([
+        'listing-hf-1042',
+        'listing-cc-8841',
+        'listing-hf-1042',
+      ]),
+    ).toThrow(/unique listing IDs/);
+  });
+
   it('rejects a snapshot that attempts to introduce live mode', () => {
     expect(
       () =>

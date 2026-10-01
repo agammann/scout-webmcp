@@ -95,4 +95,22 @@ describe('WebMCP tools', () => {
       count: 0,
     });
   });
+
+  it('rejects repeated comparison IDs before emitting a workspace update', () => {
+    const onResult = vi.fn();
+    const compare = createWebMcpTools(
+      createDemoCardMarketService(),
+      onResult,
+    ).find((tool) => tool.name === 'compare_listings')!;
+    expect(() =>
+      compare.execute({
+        listing_ids: [
+          'listing-hf-1042',
+          'listing-cc-8841',
+          ' listing-hf-1042 ',
+        ],
+      }),
+    ).toThrow(/unique listing IDs/);
+    expect(onResult).not.toHaveBeenCalled();
+  });
 });

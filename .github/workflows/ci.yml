@@ -28,6 +28,10 @@ jobs:
       - run: pnpm audit --audit-level high
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
+      - run: pnpm exec playwright install --with-deps chrome
+      - run: pnpm test:webmcp --reporter=list,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: test-results/native-webmcp.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
