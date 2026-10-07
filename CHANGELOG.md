@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.2
+
+- Preserve the application HTML with `Cache-Control: no-transform` while retaining the existing script content security policy and asset cache lifetime.
+- Check GET and HEAD responses for the application shell and static assets over the local HTTP server.
+
 ## 1.1.1
 
 - Apply available source-map-js and tinypool dependency patches with scoped overrides and the frozen lockfile.

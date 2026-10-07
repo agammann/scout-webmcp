@@ -1,6 +1,6 @@
 # Scout v1 scope, upgrade and recovery
 
-Source 1.1.1 is a browser-only lab over three fictional cards, ten deduplicated listings and nine exact market tiers. The sample date is August 29, 2026. The `scout-lab-v1.1` methodology, source records, tier isolation and six read-only page tools remain unchanged.
+Source 1.1.2 is a browser-only lab over three fictional cards, ten deduplicated listings and nine exact market tiers. The sample date is August 29, 2026. The `scout-lab-v1.1` methodology, source records, tier isolation and six read-only page tools remain unchanged.
 
 ## First successful use
 

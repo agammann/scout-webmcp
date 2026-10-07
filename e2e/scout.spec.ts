@@ -234,3 +234,49 @@ test('desktop and mobile render with working navigation and no horizontal overfl
   await page.getByTestId('search-submit').click();
   await expect(page.getByTestId('listing-card')).toHaveCount(1);
 });
+
+test('HTTP HTML preserves the document policy and static asset caching', async ({
+  page,
+  request,
+}) => {
+  let html = '';
+  for (const path of ['/', '/index.html']) {
+    for (const method of ['GET', 'HEAD'] as const) {
+      const response = await request.fetch(path, { method });
+      expect(response.status()).toBe(200);
+      expect(response.headers()['content-type']).toContain('text/html');
+      expect(response.headers()['cache-control']).toBe(
+        'public, max-age=0, must-revalidate, no-transform',
+      );
+      expect(response.headers()['content-security-policy']).toContain(
+        "script-src 'self'",
+      );
+      expect(response.headers()['content-security-policy']).not.toContain(
+        "script-src 'self' 'unsafe-inline'",
+      );
+      if (method === 'HEAD') expect(await response.body()).toHaveLength(0);
+      else {
+        const body = await response.text();
+        if (html) expect(body).toBe(html);
+        html = body;
+        expect(body).toContain('type="application/ld+json"');
+      }
+    }
+  }
+  await page.goto('/');
+  const script = await page.locator('script[src]').first().getAttribute('src');
+  expect(script).toMatch(/^\/assets\//);
+  for (const method of ['GET', 'HEAD'] as const) {
+    const asset = await request.fetch(script!, { method });
+    expect(asset.status()).toBe(200);
+    expect(asset.headers()['cache-control']).toBe(
+      'public, max-age=31536000, immutable',
+    );
+    if (method === 'HEAD') expect(await asset.body()).toHaveLength(0);
+    else expect(await asset.body()).not.toHaveLength(0);
+  }
+  const discovery = await request.get('/llms.txt');
+  expect(discovery.headers()['cache-control']).toBe(
+    'public, max-age=0, must-revalidate',
+  );
+});
