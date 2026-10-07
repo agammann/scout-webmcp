@@ -4,7 +4,7 @@ A free, browser-based **card comparison lab** for exploring exact card identity,
 
 **All cards, marketplaces, sellers, listings, and sales are fictional sample data. Scout does not search real marketplaces, value real cards, authenticate cards, or support purchases.** The fixed sample is dated August 29, 2026; it does not refresh with today's prices.
 
-Source **1.1.1** includes a verified source ZIP, MIT license and frozen lockfile. [Stability and recovery](docs/STABILITY.md).
+Source **1.1.2** includes a verified source ZIP, MIT license and frozen lockfile. [Stability and recovery](docs/STABILITY.md).
 
 [Open Scout](https://scout-webmcp-2026.alx21.chatgpt.site/) · [Usage guide](docs/DEMO.md) · [Calculation methodology](docs/METHODOLOGY.md) · [Report a problem](https://github.com/agammann/scout-webmcp/issues)
 
@@ -72,12 +72,12 @@ For Chrome, enable `chrome://flags/#enable-webmcp-testing`, relaunch, and reload
 
 Use Git, Node.js 24+, and pnpm 11.19.0, pinned in `package.json`. There is no required `.env` file, database, or provider subscription.
 
-For the pinned source, download `scout_1.1.1_source.zip` and its checksums from the [1.1.1 release](https://github.com/agammann/scout-webmcp/releases/tag/v1.1.1). Verify SHA256 before extraction with PowerShell `Get-FileHash scout_1.1.1_source.zip -Algorithm SHA256` or Linux `sha256sum -c SHA256SUMS`. Enter `scout-1.1.1` and run the installation commands below.
+For the pinned source, download `scout_1.1.2_source.zip` and its checksums from the [1.1.2 release](https://github.com/agammann/scout-webmcp/releases/tag/v1.1.2). Verify SHA256 before extraction with PowerShell `Get-FileHash scout_1.1.2_source.zip -Algorithm SHA256` or Linux `sha256sum -c SHA256SUMS`. Enter `scout-1.1.2` and run the installation commands below.
 
 ```sh
 git clone https://github.com/agammann/scout-webmcp.git
 cd scout-webmcp
-git checkout v1.1.1
+git checkout v1.1.2
 pnpm install --frozen-lockfile
 pnpm dev
 ```
