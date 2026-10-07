@@ -1,10 +1,10 @@
 {
   "name": "scout-webmcp",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "packageManager": "pnpm@11.19.0",
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=24"
   },
   "scripts": {
     "dev": "vite --configLoader native",
@@ -16,10 +16,11 @@
     "test:watch": "vitest --configLoader native --pool=threads --maxWorkers=1 --no-file-parallelism",
     "format": "oxfmt",
     "format:check": "oxfmt --check .",
-    "security:audit": "pnpm audit --audit-level high",
+    "security:audit": "pnpm audit --json",
     "test:e2e": "playwright test",
     "test:webmcp": "playwright test --config playwright.webmcp.config.ts",
-    "serve:build": "node scripts/serve-build.mjs"
+    "serve:build": "node scripts/serve-build.mjs",
+    "package:release": "node scripts/package-release.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
@@ -50,5 +51,6 @@
     "vite": "8.2.2",
     "vitest": "^4.1.11"
   },
-  "type": "module"
+  "type": "module",
+  "license": "MIT"
 }

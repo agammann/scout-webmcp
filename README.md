@@ -4,6 +4,8 @@ A free, browser-based **card comparison lab** for exploring exact card identity,
 
 **All cards, marketplaces, sellers, listings, and sales are fictional sample data. Scout does not search real marketplaces, value real cards, authenticate cards, or support purchases.** The fixed sample is dated August 29, 2026; it does not refresh with today's prices.
 
+Source **1.1.1** includes a verified source ZIP, MIT license and frozen lockfile. [Stability and recovery](docs/STABILITY.md).
+
 [Open Scout](https://scout-webmcp-2026.alx21.chatgpt.site/) · [Usage guide](docs/DEMO.md) · [Calculation methodology](docs/METHODOLOGY.md) · [Report a problem](https://github.com/agammann/scout-webmcp/issues)
 
 ## What you can learn
@@ -68,11 +70,14 @@ For Chrome, enable `chrome://flags/#enable-webmcp-testing`, relaunch, and reload
 
 ## Run and verify locally
 
-Use Git, Node.js 24, and pnpm 11.19.0, pinned in `package.json`. There is no required `.env` file, database, or provider subscription.
+Use Git, Node.js 24+, and pnpm 11.19.0, pinned in `package.json`. There is no required `.env` file, database, or provider subscription.
+
+For the pinned source, download `scout_1.1.1_source.zip` and its checksums from the [1.1.1 release](https://github.com/agammann/scout-webmcp/releases/tag/v1.1.1). Verify SHA256 before extraction with PowerShell `Get-FileHash scout_1.1.1_source.zip -Algorithm SHA256` or Linux `sha256sum -c SHA256SUMS`. Enter `scout-1.1.1` and run the installation commands below.
 
 ```sh
 git clone https://github.com/agammann/scout-webmcp.git
 cd scout-webmcp
+git checkout v1.1.1
 pnpm install --frozen-lockfile
 pnpm dev
 ```
@@ -115,3 +120,7 @@ Scout uses no real card artwork, marketplace data, seller identities, or complet
 ## Repository map
 
 `src/domain` holds canonical types; `src/engine` contains calculations; `src/services` is the shared UI/tool service; `src/providers` holds sample data and interfaces; `src/webmcp` defines the six tools. `components` contains the responsive interface. `scripts` builds and verifies the Sites worker; `tests` and `e2e` cover behavior.
+
+## Release and contributions
+
+MIT. See [LICENSE](LICENSE). [CONTRIBUTING.md](CONTRIBUTING.md) explains the development and release checks. CI retains the complete dependency audit and tests an actual source ZIP after frozen installation and production build. A source release and a hosted deployment require separate verification.

@@ -3,4 +3,6 @@ allowBuilds:
   # stay disabled in constrained build environments.
   esbuild: false
 overrides:
+  'source-map-js@<1.2.2': 1.2.2
+  'tinypool@<2.1.2': 2.1.2
   esbuild: 0.28.1
