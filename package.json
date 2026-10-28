@@ -30,7 +30,7 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "recharts": "3.8.0",
-    "tailwind-merge": "3.6.0"
+    "tailwind-merge": "3.7.0"
   },
   "devDependencies": {
     "@openai/sites-vite-plugin": "0.2.0",
