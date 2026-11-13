@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@openai/sites-vite-plugin": "0.2.0",
-    "@playwright/test": "1.58.2",
+    "@playwright/test": "1.65.0",
     "@tailwindcss/postcss": "4.3.5",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.10",
