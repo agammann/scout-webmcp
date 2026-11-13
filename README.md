@@ -70,7 +70,7 @@ For Chrome, enable `chrome://flags/#enable-webmcp-testing`, relaunch, and reload
 
 ## Run and verify locally
 
-Use Git, Node.js 24+, and pnpm 11.19.0, pinned in `package.json`. There is no required `.env` file, database, or provider subscription.
+Use Git, Node.js 24.15 or newer within the 24.x series (or Node.js 26+), and pnpm 11.19.0, pinned in `package.json`. There is no required `.env` file, database, or provider subscription.
 
 For the pinned source, download `scout_1.1.2_source.zip` and its checksums from the [1.1.2 release](https://github.com/agammann/scout-webmcp/releases/tag/v1.1.2). Verify SHA256 before extraction with PowerShell `Get-FileHash scout_1.1.2_source.zip -Algorithm SHA256` or Linux `sha256sum -c SHA256SUMS`. Enter `scout-1.1.2` and run the installation commands below.
 
