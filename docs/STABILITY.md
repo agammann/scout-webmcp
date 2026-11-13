@@ -16,6 +16,6 @@ An empty result clears old evidence. Comparison accepts two to five unique listi
 
 ## Upgrades and building
 
-Verify the source ZIP against SHA256SUMS, extract it to a fresh directory, and install with Node.js 24+ and pnpm 11.19.0 using the frozen lockfile. This release changes no sample data, calculation model or persisted format. Keep the prior source to roll back, rebuild and restart the local server.
+Verify the source ZIP against SHA256SUMS, extract it to a fresh directory, and install with Node.js 24.15 or newer within the 24.x series (or Node.js 26+) and pnpm 11.19.0 using the frozen lockfile. This release changes no sample data, calculation model or persisted format. Keep the prior source to roll back, rebuild and restart the local server.
 
 Live provider access, credentials, ingestion, persistence and real market validation are outside this release. The disabled provider configuration and draft database schema are scaffolding; configuring their placeholders does not enable live data. Source CI and actual hosted acceptance are separate checks.
