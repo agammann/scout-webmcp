@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.4
+
+- Update Vite from 8.2.4 to 8.3.7 with patched Rolldown for [GHSA-p4f5-76q4-ffq7](https://github.com/vitejs/vite/security/advisories/GHSA-p4f5-76q4-ffq7). The affected condition is an explicitly network-exposed development server; the deployed static Worker is separate and the default development binding stays loopback.
+- Point installation and stability guidance to this source release while preserving the earlier Node.js setup correction and immutable release assets.
+- Retain the fictional records, exact-tier calculations, six WebMCP tools, interface, session-only workspace and existing HTML/asset response policies.
+
 ## 1.1.3
 
 - Publish the current patched application and test dependencies with their frozen lockfile and supported Node.js range.

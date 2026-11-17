@@ -21,3 +21,10 @@ Do not publish suspected vulnerabilities with secrets or personal data. Report t
 ## Runtime boundaries
 
 All data is local, synthetic, read-only, and shipped with the client. Live data would require moving ingestion, secrets, persistence, and live adapters behind a server boundary before real records are enabled.
+
+Source 1.1.4 updates Vite to 8.3.7 with patched Rolldown for
+[GHSA-p4f5-76q4-ffq7](https://github.com/vitejs/vite/security/advisories/GHSA-p4f5-76q4-ffq7).
+The maintainer advisory identifies the former Vite 8.2.4 even though registry
+audits returned zero findings. It affects development servers explicitly exposed
+to the network, not the deployed static production Worker. Scout retains its
+default loopback development binding.
