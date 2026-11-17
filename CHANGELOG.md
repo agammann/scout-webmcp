@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.3
+
+- Publish the current patched application and test dependencies with their frozen lockfile and supported Node.js range.
+- Align the contribution guide with Node.js 24.15 or newer within 24.x, or Node.js 26+, and point installation and recovery guidance to this source delivery.
+- Retain the fictional sample data, exact-tier calculations, interface and six WebMCP tool contracts.
+- Include the verified CI artifact-transfer checks and guarded publisher in the source release.
+
 ## 1.1.2
 
 - Preserve the application HTML with `Cache-Control: no-transform` while retaining the existing script content security policy and asset cache lifetime.
